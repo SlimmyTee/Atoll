@@ -38,6 +38,8 @@ public class IslandViewModel: ObservableObject {
     
     // Adaptive Shrink / Expand State
     @Published public var forceFullDashboard: Bool = false
+    @Published public var isDwellExpanded: Bool = false
+    private var dwellTimer: DispatchWorkItem?
     
     public var hasImminentMeeting: Bool {
         guard let meeting = calendar.nextMeeting else { return false }
@@ -46,18 +48,24 @@ public class IslandViewModel: ObservableObject {
     
     // In Dashboard tab: should we show the compact single-card view or full dual-card view?
     public var isCompactDashboard: Bool {
-        // If the user manually requested full mode for this app session, honor it
+        // 1. If manually toggled full for this session, honor it
         if forceFullDashboard {
             return false
         }
         
-        // Auto-detect: If the active app consumes menu bar space (Chrome, IDE, Xcode, etc.),
-        // automatically shrink down to compact 340pt mode!
+        // 2. Dwell Intent: If the cursor has lingered on the island for >= 1.8 seconds,
+        // automatically blossom into the full dual-card dashboard!
+        if isDwellExpanded {
+            return false
+        }
+        
+        // 3. Auto-detect: If the active app consumes menu bar space (e.g. Antigravity IDE, Xcode),
+        // stay in compact 340pt mode so menus stay completely visible!
         if menuSpaceMonitor.isSpaceConstrained {
             return true
         }
         
-        // When space is ample and uncrowded, expand to full dual-card dashboard
+        // When space is ample (e.g. Slack, Finder, Safari, Notes), expand to full dashboard!
         return false
     }
     
@@ -126,12 +134,27 @@ public class IslandViewModel: ObservableObject {
         collapseWorkItem = nil
         checkMuteState()
         menuSpaceMonitor.evaluateCurrentApp()
+        
+        // Dwell Intent: If the cursor remains hovered for 1.8 seconds, automatically expand fully!
+        dwellTimer?.cancel()
+        let timerItem = DispatchWorkItem { [weak self] in
+            guard let self = self, self.isExpanded else { return }
+            withAnimation(.spring(response: 0.36, dampingFraction: 0.78)) {
+                self.isDwellExpanded = true
+            }
+        }
+        dwellTimer = timerItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8, execute: timerItem)
+        
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             self.isExpanded = true
         }
     }
     
     public func onMouseLeave() {
+        dwellTimer?.cancel()
+        dwellTimer = nil
+        
         guard !isPinned else { return }
         
         collapseWorkItem?.cancel()
@@ -139,6 +162,7 @@ public class IslandViewModel: ObservableObject {
             guard let self = self, !self.isPinned else { return }
             withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
                 self.isExpanded = false
+                self.isDwellExpanded = false
             }
         }
         collapseWorkItem = workItem

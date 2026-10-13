@@ -20,7 +20,6 @@ public class MenuBarSpaceMonitor: ObservableObject {
             object: nil
         )
         
-        // Observe screen configuration/resolution changes
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleAppSwitch),
@@ -28,7 +27,7 @@ public class MenuBarSpaceMonitor: ObservableObject {
             object: nil
         )
         
-        // Periodic heartbeat every 0.5s to guarantee continuous synchronization
+        // Heartbeat check every 0.5s to continuously synchronize with real active app
         Timer.publish(every: 0.5, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
@@ -36,7 +35,6 @@ public class MenuBarSpaceMonitor: ObservableObject {
             }
             .store(in: &cancellables)
         
-        // Initial measurement
         evaluateCurrentApp()
     }
     
@@ -45,23 +43,35 @@ public class MenuBarSpaceMonitor: ObservableObject {
     }
     
     public func targetApplication() -> NSRunningApplication? {
-        // Prefer menuBarOwningApplication so that hovering over or clicking the island
-        // panel never causes the island to evaluate itself!
+        var candidate: NSRunningApplication?
+        
         if #available(macOS 14.0, *) {
             if let mbApp = NSWorkspace.shared.menuBarOwningApplication,
                mbApp.bundleIdentifier != Bundle.main.bundleIdentifier,
                mbApp.bundleIdentifier != "com.danielumoren.dynamicisland" {
-                return mbApp
+                candidate = mbApp
             }
         }
         
-        if let front = NSWorkspace.shared.frontmostApplication,
-           front.bundleIdentifier != Bundle.main.bundleIdentifier,
-           front.bundleIdentifier != "com.danielumoren.dynamicisland" {
-            return front
+        if candidate == nil {
+            if let front = NSWorkspace.shared.frontmostApplication,
+               front.bundleIdentifier != Bundle.main.bundleIdentifier,
+               front.bundleIdentifier != "com.danielumoren.dynamicisland" {
+                candidate = front
+            }
         }
         
-        return nil
+        // If candidate is a background helper, find its parent main app
+        if let app = candidate, let bundle = app.bundleIdentifier?.lowercased(), bundle.contains(".helper") {
+            let baseId = bundle.replacingOccurrences(of: ".helper", with: "")
+            if let parent = NSWorkspace.shared.runningApplications.first(where: {
+                $0.bundleIdentifier?.lowercased() == baseId
+            }) {
+                candidate = parent
+            }
+        }
+        
+        return candidate
     }
     
     public func evaluateCurrentApp() {
@@ -76,10 +86,11 @@ public class MenuBarSpaceMonitor: ObservableObject {
         let screenWidth = screen?.frame.width ?? 1512
         let screenMidX = screenWidth / 2
         
-        // Full island half-width is 290pt (580 / 2).
-        // If the menu bar reaches beyond (screenMidX - 305pt), it would collide with the full 580pt island!
+        // Full island half-width is 290pt.
+        // A threshold of 280pt accommodates Slack (rightEdge 455pt, clearance 301pt)
+        // while safely constraining apps whose menus extend into the island zone.
         let clearance = screenMidX - rightEdge
-        let constrained = clearance < 305
+        let constrained = clearance < 280
         
         if constrained != self.isSpaceConstrained {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
@@ -118,19 +129,17 @@ public class MenuBarSpaceMonitor: ObservableObject {
             }
         }
         
-        // 2. Intelligent bundle heuristic fallback if AX is unavailable
+        // 2. Fallback heuristic only if Accessibility is unavailable
         if let bundleId = app.bundleIdentifier?.lowercased() {
-            let wideApps = [
-                "chrome", "google", "safari", "browser", "firefox", "edge", "arc", "brave", "opera",
-                "ide", "code", "xcode", "studio", "intellij", "sublime", "cursor", "windsurf",
-                "photoshop", "illustrator", "premiere", "aftereffects", "lightroom",
-                "blender", "logic", "finalcut", "davinci", "figma", "slack", "discord", "word", "excel"
+            let massiveApps = [
+                "xcode", "intellij", "sublime", "antigravity",
+                "photoshop", "illustrator", "premiere", "aftereffects"
             ]
-            if wideApps.contains(where: { bundleId.contains($0) }) {
-                return 580 // Known wide-menu application
+            if massiveApps.contains(where: { bundleId.contains($0) }) {
+                return 520
             }
         }
         
-        return 380 // Standard clearance
+        return 430
     }
 }
