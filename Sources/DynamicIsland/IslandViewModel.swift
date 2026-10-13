@@ -46,19 +46,25 @@ public class IslandViewModel: ObservableObject {
     
     // In Dashboard tab: should we show the compact single-card view or full dual-card view?
     public var isCompactDashboard: Bool {
-        if forceFullDashboard { return false }
-        if hasImminentMeeting { return false }
-        return true
+        // 1. If the current frontmost app consumes a lot of menu bar space (e.g. Antigravity IDE, Xcode, etc.),
+        // automatically shrink to compact mode to prevent any collision or crowding!
+        if menuSpaceMonitor.isSpaceConstrained {
+            return !forceFullDashboard
+        }
+        
+        // 2. When on an app with ample clearance (Finder, Safari, Notes, Slack, etc.):
+        // Automatically expand back to full dual-card dashboard!
+        return false
     }
     
     public var currentExpandedWidth: CGFloat {
         switch activeTab {
         case .dashboard:
-            return isCompactDashboard ? 360 : 580
+            return isCompactDashboard ? 340 : 580
         case .shelf:
-            return 480
+            return isCompactDashboard ? 380 : 480
         case .timer:
-            return 380
+            return 360
         }
     }
     
@@ -82,6 +88,7 @@ public class IslandViewModel: ObservableObject {
     // Controllers
     public let media = MediaController()
     public let calendar = CalendarController()
+    public let menuSpaceMonitor = MenuBarSpaceMonitor()
     
     private var collapseWorkItem: DispatchWorkItem?
     private var cancellables = Set<AnyCancellable>()
@@ -93,6 +100,10 @@ public class IslandViewModel: ObservableObject {
         }.store(in: &cancellables)
         
         calendar.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }.store(in: &cancellables)
+        
+        menuSpaceMonitor.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }.store(in: &cancellables)
         
