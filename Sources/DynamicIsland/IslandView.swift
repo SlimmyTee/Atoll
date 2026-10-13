@@ -162,7 +162,7 @@ public struct IslandView: View {
     private var expandedContent: some View {
         VStack(spacing: 5) {
             // Header Bar
-            HStack(spacing: 8) {
+            HStack(spacing: 0) {
                 // Dashboard Tab (Left)
                 Button(action: {
                     withAnimation(.easeInOut(duration: 0.18)) {
@@ -183,83 +183,87 @@ public struct IslandView: View {
                 }
                 .buttonStyle(.plain)
                 
-                Spacer()
+                Spacer(minLength: 24)
                 
-                // Shelf & Timer Tabs (Right)
-                ForEach([IslandTab.shelf, IslandTab.timer]) { tab in
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.18)) {
-                            vm.activeTab = tab
-                        }
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: tab.iconName)
-                                .font(.system(size: 10))
-                            Text(tab.rawValue)
-                                .font(.system(size: 10, weight: .medium))
-                            
-                            if tab == .shelf && !vm.droppedFiles.isEmpty {
-                                Text("\(vm.droppedFiles.count)")
-                                    .font(.system(size: 8, weight: .bold))
-                                    .padding(.horizontal, 4)
-                                    .padding(.vertical, 1)
-                                    .background(Color.white.opacity(0.2))
-                                    .clipShape(Capsule())
+                // Right Button Group (Shifted right to give physical camera notch plenty of clearance)
+                HStack(spacing: 5) {
+                    // Shelf & Timer Tabs
+                    ForEach([IslandTab.shelf, IslandTab.timer]) { tab in
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.18)) {
+                                vm.activeTab = tab
                             }
+                        }) {
+                            HStack(spacing: 3.5) {
+                                Image(systemName: tab.iconName)
+                                    .font(.system(size: 9.5))
+                                Text(tab.rawValue)
+                                    .font(.system(size: 9.5, weight: .medium))
+                                
+                                if tab == .shelf && !vm.droppedFiles.isEmpty {
+                                    Text("\(vm.droppedFiles.count)")
+                                        .font(.system(size: 8, weight: .bold))
+                                        .padding(.horizontal, 4)
+                                        .padding(.vertical, 1)
+                                        .background(Color.white.opacity(0.2))
+                                        .clipShape(Capsule())
+                                }
+                            }
+                            .foregroundColor(vm.activeTab == tab ? .white : .white.opacity(0.5))
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(vm.activeTab == tab ? Color.white.opacity(0.15) : Color.clear)
+                            .clipShape(Capsule())
                         }
-                        .foregroundColor(vm.activeTab == tab ? .white : .white.opacity(0.5))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3.5)
-                        .background(vm.activeTab == tab ? Color.white.opacity(0.15) : Color.clear)
-                        .clipShape(Capsule())
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
-                }
-                
-                // Shrink / Expand toggle in Dashboard tab
-                if vm.activeTab == .dashboard {
+                    
+                    // Shrink / Expand toggle in Dashboard tab
+                    if vm.activeTab == .dashboard {
+                        Button(action: {
+                            vm.toggleDashboardSize()
+                        }) {
+                            Image(systemName: vm.isCompactDashboard ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundColor(.white.opacity(0.65))
+                                .padding(4.5)
+                                .background(Color.white.opacity(0.06))
+                                .clipShape(Circle())
+                        }
+                        .buttonStyle(.plain)
+                        .help(vm.isCompactDashboard ? "Expand to Full Dashboard" : "Shrink to Compact Player")
+                    }
+                    
+                    // Pin Button
                     Button(action: {
-                        vm.toggleDashboardSize()
+                        vm.isPinned.toggle()
                     }) {
-                        Image(systemName: vm.isCompactDashboard ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-                            .font(.system(size: 9.5, weight: .bold))
-                            .foregroundColor(.white.opacity(0.65))
-                            .padding(5)
+                        Image(systemName: vm.isPinned ? "pin.fill" : "pin")
+                            .font(.system(size: 9.5))
+                            .foregroundColor(vm.isPinned ? .orange : .white.opacity(0.4))
+                            .padding(4.5)
                             .background(Color.white.opacity(0.06))
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
-                    .help(vm.isCompactDashboard ? "Expand to Full Dashboard" : "Shrink to Compact Player")
+                    .help(vm.isPinned ? "Unpin Island" : "Pin Island open")
+                    
+                    // Collapse Button
+                    Button(action: {
+                        vm.toggleExpand()
+                    }) {
+                        Image(systemName: "chevron.up")
+                            .font(.system(size: 9.5, weight: .bold))
+                            .foregroundColor(.white.opacity(0.6))
+                            .padding(4.5)
+                            .background(Color.white.opacity(0.06))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
                 }
-                
-                // Pin Button
-                Button(action: {
-                    vm.isPinned.toggle()
-                }) {
-                    Image(systemName: vm.isPinned ? "pin.fill" : "pin")
-                        .font(.system(size: 10))
-                        .foregroundColor(vm.isPinned ? .orange : .white.opacity(0.4))
-                        .padding(5)
-                        .background(Color.white.opacity(0.06))
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .help(vm.isPinned ? "Unpin Island" : "Pin Island open")
-                
-                // Collapse Button
-                Button(action: {
-                    vm.toggleExpand()
-                }) {
-                    Image(systemName: "chevron.up")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(.white.opacity(0.6))
-                        .padding(5)
-                        .background(Color.white.opacity(0.06))
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 10)
+            .padding(.leading, 10)
+            .padding(.trailing, 8)
             .padding(.top, 6)
             
             // Tab Body
