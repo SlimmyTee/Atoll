@@ -187,27 +187,34 @@ public struct IslandView: View {
                 
                 // Right Button Group (Shifted right to give physical camera notch plenty of clearance)
                 HStack(spacing: 5) {
-                    // Timer Tab (and Shelf badge only if files were dropped)
-                    if !vm.droppedFiles.isEmpty {
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.18)) {
-                                vm.activeTab = .shelf
-                            }
-                        }) {
-                            HStack(spacing: 3.5) {
-                                Image(systemName: IslandTab.shelf.iconName)
-                                    .font(.system(size: 9.5))
-                                Text("Shelf (\(vm.droppedFiles.count))")
-                                    .font(.system(size: 9.5, weight: .bold))
-                            }
-                            .foregroundColor(.cyan)
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 3)
-                            .background(Color.cyan.opacity(0.18))
-                            .clipShape(Capsule())
+                    // Shelf Tab
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            vm.activeTab = .shelf
                         }
-                        .buttonStyle(.plain)
+                    }) {
+                        HStack(spacing: 3.5) {
+                            Image(systemName: IslandTab.shelf.iconName)
+                                .font(.system(size: 9.5))
+                            Text(IslandTab.shelf.rawValue)
+                                .font(.system(size: 9.5, weight: .medium))
+                            
+                            if !vm.droppedFiles.isEmpty {
+                                Text("\(vm.droppedFiles.count)")
+                                    .font(.system(size: 8, weight: .bold))
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 1)
+                                    .background(Color.white.opacity(0.2))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        .foregroundColor(vm.activeTab == .shelf ? .white : .white.opacity(0.5))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(vm.activeTab == .shelf ? Color.white.opacity(0.15) : Color.clear)
+                        .clipShape(Capsule())
                     }
+                    .buttonStyle(.plain)
                     
                     // Timer Tab
                     Button(action: {
