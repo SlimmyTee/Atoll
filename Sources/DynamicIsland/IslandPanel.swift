@@ -73,8 +73,8 @@ public class IslandWindowController: NSObject {
         hostingView.isPointInside = { [weak self] point in
             guard let self = self else { return false }
             let isExp = self.viewModel.isExpanded
-            let currentW: CGFloat = isExp ? 590 : (ScreenMetrics.notchWidth + 90)
-            let currentH: CGFloat = isExp ? 190 : (ScreenMetrics.notchHeight + 10)
+            let currentW: CGFloat = isExp ? (self.viewModel.currentExpandedWidth + 12) : (ScreenMetrics.notchWidth + 90)
+            let currentH: CGFloat = isExp ? (self.viewModel.currentExpandedHeight + 16) : (ScreenMetrics.notchHeight + 10)
             
             let minX = (self.windowWidth - currentW) / 2
             let minY = self.windowHeight - currentH

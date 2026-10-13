@@ -78,7 +78,7 @@ public struct IslandView: View {
     // Dynamic dimensions
     private var islandWidth: CGFloat {
         if vm.isExpanded {
-            return 580
+            return vm.currentExpandedWidth
         }
         if isTargetedForDrop {
             return 320
@@ -91,7 +91,7 @@ public struct IslandView: View {
     
     private var islandHeight: CGFloat {
         if vm.isExpanded {
-            return 172
+            return vm.currentExpandedHeight
         }
         return ScreenMetrics.notchHeight
     }
@@ -216,6 +216,22 @@ public struct IslandView: View {
                     .buttonStyle(.plain)
                 }
                 
+                // Shrink / Expand toggle in Dashboard tab
+                if vm.activeTab == .dashboard {
+                    Button(action: {
+                        vm.toggleDashboardSize()
+                    }) {
+                        Image(systemName: vm.isCompactDashboard ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                            .font(.system(size: 9.5, weight: .bold))
+                            .foregroundColor(.white.opacity(0.65))
+                            .padding(5)
+                            .background(Color.white.opacity(0.06))
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .help(vm.isCompactDashboard ? "Expand to Full Dashboard" : "Shrink to Compact Player")
+                }
+                
                 // Pin Button
                 Button(action: {
                     vm.isPinned.toggle()
@@ -270,9 +286,43 @@ struct DashboardSplitView: View {
     
     var body: some View {
         VStack(spacing: 5) {
-            HStack(spacing: 8) {
-                // Left: Music Player Card
-                HStack(spacing: 8) {
+            if vm.isCompactDashboard {
+                compactContent
+            } else {
+                fullContent
+            }
+            
+            bottomUtilityRow
+        }
+    }
+    
+    private var compactContent: some View {
+        Group {
+            if vm.media.isAudioPlaying || !vm.media.currentTrack.title.isEmpty {
+                musicPlayerCard
+            } else if vm.calendar.nextMeeting != nil {
+                calendarCard
+            } else {
+                musicPlayerCard
+            }
+        }
+    }
+    
+    private var fullContent: some View {
+        HStack(spacing: 8) {
+            musicPlayerCard
+            
+            // Sleek Divider
+            Rectangle()
+                .fill(Color.white.opacity(0.1))
+                .frame(width: 1, height: 68)
+            
+            calendarCard
+        }
+    }
+    
+    private var musicPlayerCard: some View {
+        HStack(spacing: 8) {
                     // Album Art
                     ZStack {
                         if let data = vm.media.currentTrack.artworkData, let nsImage = NSImage(data: data) {
@@ -313,6 +363,25 @@ struct DashboardSplitView: View {
                                 .lineLimit(1)
                             
                             Spacer(minLength: 2)
+                            
+                            // If in compact mode and there is an upcoming meeting later today, show a subtle chip
+                            if vm.isCompactDashboard, let next = vm.calendar.nextMeeting {
+                                Button(action: { vm.toggleDashboardSize() }) {
+                                    HStack(spacing: 2.5) {
+                                        Image(systemName: "calendar")
+                                            .font(.system(size: 7.5))
+                                        Text(next.timeUntilFormatted)
+                                            .font(.system(size: 7.5, weight: .bold))
+                                    }
+                                    .foregroundColor(.cyan)
+                                    .padding(.horizontal, 4.5)
+                                    .padding(.vertical, 1.5)
+                                    .background(Color.cyan.opacity(0.14))
+                                    .clipShape(Capsule())
+                                }
+                                .buttonStyle(.plain)
+                                .help("Next meeting: \(next.title). Click to expand.")
+                            }
                             
                             Circle()
                                 .fill(vm.media.currentTrack.source == .spotify ? Color.green : Color.pink)
@@ -373,14 +442,10 @@ struct DashboardSplitView: View {
                 .padding(.vertical, 5)
                 .background(Color.white.opacity(0.05))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                
-                // Sleek Divider
-                Rectangle()
-                    .fill(Color.white.opacity(0.1))
-                    .frame(width: 1, height: 68)
-            
-            // Right: Calendar & Meeting Card
-            VStack(alignment: .leading, spacing: 2.5) {
+    }
+    
+    private var calendarCard: some View {
+        VStack(alignment: .leading, spacing: 2.5) {
                 if !vm.calendar.hasCalendarAccess {
                     VStack(spacing: 4) {
                         Image(systemName: "calendar.badge.plus")
@@ -516,9 +581,9 @@ struct DashboardSplitView: View {
             .padding(.vertical, 5)
             .background(Color.white.opacity(0.05))
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-        }
-        
-        // Bottom Row: Lock & Mute on Left, Shelf & Timer on Right
+    }
+    
+    private var bottomUtilityRow: some View {
         HStack(spacing: 8) {
             // Left: Mute & Lock Quick Action Buttons
             HStack(spacing: 6) {
@@ -633,9 +698,7 @@ struct DashboardSplitView: View {
         }
     }
 }
-}
 
-// Compact equalizer animation
 struct CompactWaveformView: View {
     @State private var animating: Bool = false
     

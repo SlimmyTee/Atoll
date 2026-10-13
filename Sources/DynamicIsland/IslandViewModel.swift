@@ -36,6 +36,49 @@ public class IslandViewModel: ObservableObject {
     // Quick Settings State
     @Published public var isMuted: Bool = false
     
+    // Adaptive Shrink / Expand State
+    @Published public var forceFullDashboard: Bool = false
+    
+    public var hasImminentMeeting: Bool {
+        guard let meeting = calendar.nextMeeting else { return false }
+        return meeting.isImminent
+    }
+    
+    // In Dashboard tab: should we show the compact single-card view or full dual-card view?
+    public var isCompactDashboard: Bool {
+        if forceFullDashboard { return false }
+        if hasImminentMeeting { return false }
+        return true
+    }
+    
+    public var currentExpandedWidth: CGFloat {
+        switch activeTab {
+        case .dashboard:
+            return isCompactDashboard ? 360 : 580
+        case .shelf:
+            return 480
+        case .timer:
+            return 380
+        }
+    }
+    
+    public var currentExpandedHeight: CGFloat {
+        switch activeTab {
+        case .dashboard:
+            return isCompactDashboard ? 134 : 172
+        case .shelf:
+            return 172
+        case .timer:
+            return 172
+        }
+    }
+    
+    public func toggleDashboardSize() {
+        withAnimation(.spring(response: 0.32, dampingFraction: 0.8)) {
+            forceFullDashboard.toggle()
+        }
+    }
+    
     // Controllers
     public let media = MediaController()
     public let calendar = CalendarController()

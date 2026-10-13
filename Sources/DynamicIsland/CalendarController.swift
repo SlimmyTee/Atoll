@@ -24,6 +24,13 @@ public struct MeetingEvent: Identifiable, Sendable {
         return max(0, Int(diff / 60))
     }
     
+    // An event is imminent if it is ongoing or starts within 45 minutes
+    public var isImminent: Bool {
+        if isOngoing { return true }
+        if isAllDay { return false }
+        return minutesUntilStart <= 45
+    }
+    
     // Only show join action when the meeting is ongoing or within 10 minutes of starting
     public var canJoinNow: Bool {
         guard meetingLink != nil else { return false }
