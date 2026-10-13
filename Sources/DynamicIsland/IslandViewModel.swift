@@ -71,11 +71,11 @@ public class IslandViewModel: ObservableObject {
     public var currentExpandedHeight: CGFloat {
         switch activeTab {
         case .dashboard:
-            return isCompactDashboard ? 134 : 172
+            return 130
         case .shelf:
-            return 172
+            return 136
         case .timer:
-            return 172
+            return 130
         }
     }
     

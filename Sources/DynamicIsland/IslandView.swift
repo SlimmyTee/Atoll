@@ -187,36 +187,47 @@ public struct IslandView: View {
                 
                 // Right Button Group (Shifted right to give physical camera notch plenty of clearance)
                 HStack(spacing: 5) {
-                    // Shelf & Timer Tabs
-                    ForEach([IslandTab.shelf, IslandTab.timer]) { tab in
+                    // Timer Tab (and Shelf badge only if files were dropped)
+                    if !vm.droppedFiles.isEmpty {
                         Button(action: {
                             withAnimation(.easeInOut(duration: 0.18)) {
-                                vm.activeTab = tab
+                                vm.activeTab = .shelf
                             }
                         }) {
                             HStack(spacing: 3.5) {
-                                Image(systemName: tab.iconName)
+                                Image(systemName: IslandTab.shelf.iconName)
                                     .font(.system(size: 9.5))
-                                Text(tab.rawValue)
-                                    .font(.system(size: 9.5, weight: .medium))
-                                
-                                if tab == .shelf && !vm.droppedFiles.isEmpty {
-                                    Text("\(vm.droppedFiles.count)")
-                                        .font(.system(size: 8, weight: .bold))
-                                        .padding(.horizontal, 4)
-                                        .padding(.vertical, 1)
-                                        .background(Color.white.opacity(0.2))
-                                        .clipShape(Capsule())
-                                }
+                                Text("Shelf (\(vm.droppedFiles.count))")
+                                    .font(.system(size: 9.5, weight: .bold))
                             }
-                            .foregroundColor(vm.activeTab == tab ? .white : .white.opacity(0.5))
+                            .foregroundColor(.cyan)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 3)
-                            .background(vm.activeTab == tab ? Color.white.opacity(0.15) : Color.clear)
+                            .background(Color.cyan.opacity(0.18))
                             .clipShape(Capsule())
                         }
                         .buttonStyle(.plain)
                     }
+                    
+                    // Timer Tab
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            vm.activeTab = .timer
+                        }
+                    }) {
+                        HStack(spacing: 3.5) {
+                            Image(systemName: IslandTab.timer.iconName)
+                                .font(.system(size: 9.5))
+                            Text(IslandTab.timer.rawValue)
+                                .font(.system(size: 9.5, weight: .medium))
+                        }
+                        .foregroundColor(vm.activeTab == .timer ? .white : .white.opacity(0.5))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(vm.activeTab == .timer ? Color.white.opacity(0.15) : Color.clear)
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
                     
                     // Shrink / Expand toggle in Dashboard tab
                     if vm.activeTab == .dashboard {
@@ -278,8 +289,7 @@ public struct IslandView: View {
                 }
             }
             .padding(.horizontal, 10)
-            
-            Spacer(minLength: 0)
+            .padding(.bottom, 6)
         }
     }
 }
@@ -677,26 +687,7 @@ struct DashboardSplitView: View {
                 .background(Color.white.opacity(0.04))
                 .clipShape(Capsule())
                 
-                // Quick Shelf Button
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.18)) {
-                        vm.activeTab = .shelf
-                    }
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "tray.and.arrow.down.fill")
-                            .font(.system(size: 9))
-                            .foregroundColor(.cyan)
-                        Text(vm.droppedFiles.isEmpty ? "Shelf" : "Shelf (\(vm.droppedFiles.count))")
-                            .font(.system(size: 9, weight: .medium))
-                            .foregroundColor(.white.opacity(0.8))
-                    }
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 3)
-                    .background(Color.white.opacity(0.04))
-                    .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
+
             }
             .padding(.horizontal, 2)
         }
