@@ -196,8 +196,10 @@ public struct IslandView: View {
                         HStack(spacing: 3.5) {
                             Image(systemName: IslandTab.shelf.iconName)
                                 .font(.system(size: 9.5))
-                            Text(IslandTab.shelf.rawValue)
-                                .font(.system(size: 9.5, weight: .medium))
+                            if !vm.isCompactDashboard {
+                                Text(IslandTab.shelf.rawValue)
+                                    .font(.system(size: 9.5, weight: .medium))
+                            }
                             
                             if !vm.droppedFiles.isEmpty {
                                 Text("\(vm.droppedFiles.count)")
@@ -225,8 +227,10 @@ public struct IslandView: View {
                         HStack(spacing: 3.5) {
                             Image(systemName: IslandTab.timer.iconName)
                                 .font(.system(size: 9.5))
-                            Text(IslandTab.timer.rawValue)
-                                .font(.system(size: 9.5, weight: .medium))
+                            if !vm.isCompactDashboard {
+                                Text(IslandTab.timer.rawValue)
+                                    .font(.system(size: 9.5, weight: .medium))
+                            }
                         }
                         .foregroundColor(vm.activeTab == .timer ? .white : .white.opacity(0.5))
                         .padding(.horizontal, 7)
