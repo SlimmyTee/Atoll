@@ -46,14 +46,18 @@ public class IslandViewModel: ObservableObject {
     
     // In Dashboard tab: should we show the compact single-card view or full dual-card view?
     public var isCompactDashboard: Bool {
-        // 1. If the current frontmost app consumes a lot of menu bar space (e.g. Antigravity IDE, Xcode, etc.),
-        // automatically shrink to compact mode to prevent any collision or crowding!
-        if menuSpaceMonitor.isSpaceConstrained {
-            return !forceFullDashboard
+        // If the user manually requested full mode for this app session, honor it
+        if forceFullDashboard {
+            return false
         }
         
-        // 2. When on an app with ample clearance (Finder, Safari, Notes, Slack, etc.):
-        // Automatically expand back to full dual-card dashboard!
+        // Auto-detect: If the active app consumes menu bar space (Chrome, IDE, Xcode, etc.),
+        // automatically shrink down to compact 340pt mode!
+        if menuSpaceMonitor.isSpaceConstrained {
+            return true
+        }
+        
+        // When space is ample and uncrowded, expand to full dual-card dashboard
         return false
     }
     
@@ -107,6 +111,13 @@ public class IslandViewModel: ObservableObject {
             self?.objectWillChange.send()
         }.store(in: &cancellables)
         
+        menuSpaceMonitor.$activeAppName
+            .dropFirst()
+            .sink { [weak self] _ in
+                self?.forceFullDashboard = false
+            }
+            .store(in: &cancellables)
+        
         checkMuteState()
     }
     
@@ -114,6 +125,7 @@ public class IslandViewModel: ObservableObject {
         collapseWorkItem?.cancel()
         collapseWorkItem = nil
         checkMuteState()
+        menuSpaceMonitor.evaluateCurrentApp()
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             self.isExpanded = true
         }

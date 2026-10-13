@@ -28,19 +28,44 @@ public class MenuBarSpaceMonitor: ObservableObject {
             object: nil
         )
         
+        // Periodic heartbeat every 0.5s to guarantee continuous synchronization
+        Timer.publish(every: 0.5, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.evaluateCurrentApp()
+            }
+            .store(in: &cancellables)
+        
         // Initial measurement
         evaluateCurrentApp()
     }
     
     @objc private func handleAppSwitch() {
-        // Debounce slightly to allow the newly focused application's menu bar to populate
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) { [weak self] in
-            self?.evaluateCurrentApp()
+        evaluateCurrentApp()
+    }
+    
+    public func targetApplication() -> NSRunningApplication? {
+        // Prefer menuBarOwningApplication so that hovering over or clicking the island
+        // panel never causes the island to evaluate itself!
+        if #available(macOS 14.0, *) {
+            if let mbApp = NSWorkspace.shared.menuBarOwningApplication,
+               mbApp.bundleIdentifier != Bundle.main.bundleIdentifier,
+               mbApp.bundleIdentifier != "com.danielumoren.dynamicisland" {
+                return mbApp
+            }
         }
+        
+        if let front = NSWorkspace.shared.frontmostApplication,
+           front.bundleIdentifier != Bundle.main.bundleIdentifier,
+           front.bundleIdentifier != "com.danielumoren.dynamicisland" {
+            return front
+        }
+        
+        return nil
     }
     
     public func evaluateCurrentApp() {
-        guard let app = NSWorkspace.shared.frontmostApplication else { return }
+        guard let app = targetApplication() else { return }
         let appName = app.localizedName ?? "App"
         self.activeAppName = appName
         
@@ -51,17 +76,15 @@ public class MenuBarSpaceMonitor: ObservableObject {
         let screenWidth = screen?.frame.width ?? 1512
         let screenMidX = screenWidth / 2
         
-        // Full island half-width is 290pt (580 / 2) + 25pt clearance buffer = 315pt
+        // Full island half-width is 290pt (580 / 2).
+        // If the menu bar reaches beyond (screenMidX - 305pt), it would collide with the full 580pt island!
         let clearance = screenMidX - rightEdge
-        let constrained = clearance < 315
+        let constrained = clearance < 305
         
         if constrained != self.isSpaceConstrained {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 self.isSpaceConstrained = constrained
             }
-            #if DEBUG
-            print("🧭 [MenuBarSpaceMonitor] App '\(appName)' menuRightEdge: \(rightEdge)pt -> spaceConstrained: \(constrained)")
-            #endif
         }
     }
     
@@ -95,18 +118,19 @@ public class MenuBarSpaceMonitor: ObservableObject {
             }
         }
         
-        // 2. Intelligent bundle heuristic fallback if AX not granted
+        // 2. Intelligent bundle heuristic fallback if AX is unavailable
         if let bundleId = app.bundleIdentifier?.lowercased() {
             let wideApps = [
-                "ide", "code", "xcode", "studio", "intellij", "sublime",
-                "photoshop", "illustrator", "premiere", "aftereffects",
-                "blender", "logic", "finalcut", "davinci"
+                "chrome", "google", "safari", "browser", "firefox", "edge", "arc", "brave", "opera",
+                "ide", "code", "xcode", "studio", "intellij", "sublime", "cursor", "windsurf",
+                "photoshop", "illustrator", "premiere", "aftereffects", "lightroom",
+                "blender", "logic", "finalcut", "davinci", "figma", "slack", "discord", "word", "excel"
             ]
             if wideApps.contains(where: { bundleId.contains($0) }) {
-                return 520
+                return 580 // Known wide-menu application
             }
         }
         
-        return 380 // Standard app clearance
+        return 380 // Standard clearance
     }
 }
