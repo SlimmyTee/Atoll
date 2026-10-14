@@ -8,7 +8,7 @@ echo "🔨 Ensuring latest release build of DynamicIsland..."
 ./bundle.sh
 
 DMG_NAME="DynamicIsland.dmg"
-VOLUME_NAME="DynamicIsland"
+VOLUME_NAME="Atoll"
 STAGING_DIR="$DIR/.build/dmg_staging"
 
 echo "🧹 Preparing DMG staging directory..."
@@ -16,7 +16,7 @@ rm -rf "$STAGING_DIR"
 mkdir -p "$STAGING_DIR"
 
 echo "📦 Copying DynamicIsland.app..."
-cp -R "$DIR/DynamicIsland.app" "$STAGING_DIR/"
+cp -R "$DIR/DynamicIsland.app" "$STAGING_DIR/Atoll.app"
 
 echo "🔗 Creating /Applications drag-and-drop link..."
 ln -s /Applications "$STAGING_DIR/Applications"
@@ -36,8 +36,13 @@ rm -rf "$STAGING_DIR"
 echo "🔏 Ad-hoc signing disk image..."
 codesign --force --sign - "$DIR/$DMG_NAME"
 
+# Sync to download folders
+mkdir -p "$DIR/downloads" "$DIR/landing/downloads"
+cp "$DIR/$DMG_NAME" "$DIR/downloads/Atoll.dmg"
+cp "$DIR/$DMG_NAME" "$DIR/landing/downloads/Atoll.dmg"
+
 DMG_SIZE=$(ls -lh "$DIR/$DMG_NAME" | awk '{print $5}')
 echo ""
 echo "🎉 Successfully created DMG installer!"
 echo "📍 Location: $DIR/$DMG_NAME ($DMG_SIZE)"
-echo "✨ Users can double-click this DMG and drag DynamicIsland to Applications."
+echo "✨ Copied to downloads/Atoll.dmg and landing/downloads/Atoll.dmg"
