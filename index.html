@@ -708,6 +708,25 @@
         </div>
 
         <div class="faq-accordion" id="faq-accordion">
+          <div class="faq-item" id="faq-gatekeeper">
+            <button class="faq-question" id="faq-btn-gatekeeper">
+              <span>Why does macOS say "Apple could not verify Atoll" when opening?</span>
+              <span class="faq-chevron">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <p>Atoll is free, open-source software built independently without Apple's /year developer fee. Because of this, macOS Gatekeeper shows a standard security alert for downloaded files.</p>
+              <p>To open it in 5 seconds:</p>
+              <ol style="margin-left: 20px; line-height: 1.8;">
+                <li>Click <strong>Done</strong> on the warning dialog (do not move to bin).</li>
+                <li>Open <strong>System Settings > Privacy & Security</strong>.</li>
+                <li>Scroll down to the <strong>Security</strong> section and click <strong>"Open Anyway"</strong> next to Atoll.</li>
+                <li>Alternatively, right-click (or Control-click) <code>Atoll.dmg</code> in Finder and select <strong>Open</strong>.</li>
+              </ol>
+            </div>
+          </div>
+
           <div class="faq-item" id="faq-1">
             <button class="faq-question" id="faq-btn-1">
               <span>What versions of macOS does Atoll support?</span>
