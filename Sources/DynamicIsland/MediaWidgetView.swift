@@ -5,6 +5,46 @@ public struct MediaWidgetView: View {
     @ObservedObject var media: MediaController
     
     public var body: some View {
+        if media.hasActiveMedia {
+            activePlayerView
+        } else {
+            emptyStateView
+        }
+    }
+    
+    private var emptyStateView: some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color.white.opacity(0.04))
+                    .frame(width: 80, height: 80)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+                
+                Image(systemName: "music.note")
+                    .font(.system(size: 26, weight: .medium))
+                    .foregroundColor(.white.opacity(0.35))
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text("No Media Playing")
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white)
+                
+                Text("Play a track on Spotify, Apple Music, or YouTube to control it from the notch.")
+                    .font(.system(size: 11))
+                    .foregroundColor(.white.opacity(0.55))
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(8)
+    }
+    
+    private var activePlayerView: some View {
         HStack(spacing: 16) {
             // Album art with ambient glow
             ZStack {

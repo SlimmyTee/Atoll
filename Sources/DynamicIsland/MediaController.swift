@@ -21,6 +21,20 @@ public struct TrackInfo: Sendable, Equatable {
         case demo = "Now Playing"
     }
     
+    public static var empty: TrackInfo {
+        TrackInfo(
+            title: "",
+            artist: "",
+            album: "",
+            isPlaying: false,
+            position: 0,
+            duration: 0,
+            source: .demo,
+            artworkUrl: nil,
+            artworkData: nil
+        )
+    }
+    
     public static var demoTrack: TrackInfo {
         TrackInfo(
             title: "Starboy",
@@ -38,8 +52,9 @@ public struct TrackInfo: Sendable, Equatable {
 
 @MainActor
 public class MediaController: ObservableObject {
-    @Published public var currentTrack: TrackInfo = .demoTrack
-    @Published public var isAudioPlaying: Bool = true
+    @Published public var currentTrack: TrackInfo = .empty
+    @Published public var hasActiveMedia: Bool = false
+    @Published public var isAudioPlaying: Bool = false
     
     private var pollTimer: DispatchSourceTimer?
     private let pollQueue = DispatchQueue(label: "com.danielumoren.dynamicisland.mediaPoll", qos: .userInitiated)
@@ -141,6 +156,7 @@ public class MediaController: ObservableObject {
             }
             
             self.currentTrack = foundTrack
+            self.hasActiveMedia = true
             self.isAudioPlaying = foundTrack.isPlaying
             
             // Asynchronously fetch fast-resolution artwork if not already cached
@@ -158,35 +174,10 @@ public class MediaController: ObservableObject {
                 }
             }
         } else {
-            // No native player active, simulate demo track progression
-            if self.currentTrack.source == .demo {
-                if self.isAudioPlaying {
-                    var updated = self.currentTrack
-                    updated.position += 0.8
-                    if updated.position > updated.duration { updated.position = 0 }
-                    self.currentTrack = updated
-                }
-                
-                if self.currentTrack.artworkData == nil, let url = self.currentTrack.artworkUrl {
-                    if let cached = self.artworkCache[url] {
-                        self.currentTrack.artworkData = cached
-                    } else if let diskData = Self.loadCachedArtworkFromDisk(for: url) {
-                        self.artworkCache[url] = diskData
-                        self.currentTrack.artworkData = diskData
-                    } else {
-                        Task { [weak self] in
-                            let data = await Self.downloadImageData(from: url)
-                            guard let self = self, let data = data else { return }
-                            await MainActor.run {
-                                self.artworkCache[url] = data
-                                Self.saveArtworkToDisk(data: data, for: url)
-                                if self.currentTrack.artworkUrl == url {
-                                    self.currentTrack.artworkData = data
-                                }
-                            }
-                        }
-                    }
-                }
+            // No native player active
+            if self.hasActiveMedia {
+                self.hasActiveMedia = false
+                self.isAudioPlaying = false
             }
         }
     }

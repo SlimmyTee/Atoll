@@ -101,7 +101,7 @@ public struct IslandView: View {
         HStack(spacing: 0) {
             // Left Ear: exactly 40pt to the left of the physical camera cutout
             HStack {
-                if let data = vm.media.currentTrack.artworkData, let nsImg = NSImage(data: data) {
+                if vm.media.hasActiveMedia, let data = vm.media.currentTrack.artworkData, let nsImg = NSImage(data: data) {
                     Image(nsImage: nsImg)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -111,7 +111,7 @@ public struct IslandView: View {
                             RoundedRectangle(cornerRadius: 4, style: .continuous)
                                 .strokeBorder(Color.white.opacity(0.2), lineWidth: 0.5)
                         )
-                } else if vm.media.isAudioPlaying {
+                } else if vm.media.hasActiveMedia && vm.media.isAudioPlaying {
                     Circle()
                         .fill(LinearGradient(colors: [.purple, .blue], startPoint: .top, endPoint: .bottom))
                         .frame(width: 14, height: 14)
@@ -121,9 +121,9 @@ public struct IslandView: View {
                                 .foregroundColor(.white)
                         )
                 } else {
-                    Image(systemName: "applelogo")
-                        .font(.system(size: 11))
-                        .foregroundColor(.white.opacity(0.6))
+                    Circle()
+                        .fill(Color.white.opacity(0.12))
+                        .frame(width: 5, height: 5)
                 }
             }
             .frame(width: 40, alignment: .center)
@@ -441,6 +441,48 @@ struct DashboardSplitView: View {
     }
     
     private var musicPlayerCard: some View {
+        Group {
+            if vm.media.hasActiveMedia {
+                activeMusicPlayerCard
+            } else {
+                emptyMusicPlayerCard
+            }
+        }
+    }
+    
+    private var emptyMusicPlayerCard: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(Color.white.opacity(0.04))
+                    .frame(width: 44, height: 44)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            .strokeBorder(Color.white.opacity(0.08), lineWidth: 0.5)
+                    )
+                
+                Image(systemName: "music.note")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.35))
+            }
+            .frame(width: 44, height: 44)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text("No Media Playing")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundColor(.white)
+                
+                Text("Play on Spotify, Apple Music, or YouTube")
+                    .font(.system(size: 9.5))
+                    .foregroundColor(.white.opacity(0.5))
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    
+    private var activeMusicPlayerCard: some View {
         HStack(spacing: 8) {
                     // Album Art
                     ZStack {
