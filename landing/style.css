@@ -387,66 +387,200 @@ body {
   color: var(--text-main);
 }
 
-/* Macbook Screen Simulation */
-.macbook-screen-wrapper {
-  background: #111317;
-  border-radius: 24px;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 60px rgba(139, 92, 246, 0.15);
+/* ==========================================================================
+   AUTHENTIC MACBOOK PRO HARDWARE SCREEN ENCLOSURE
+   ========================================================================== */
+.macbook-hardware-container {
+  position: relative;
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+/* Space Black CNC-Machined Anodized Aluminum Display Lid */
+.macbook-lid {
+  position: relative;
+  background: linear-gradient(180deg, #24272f 0%, #16181e 35%, #0e1014 100%);
+  border-radius: 28px 28px 4px 4px;
+  padding: 10px 10px 0 10px;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 0 0 2px rgba(0, 0, 0, 0.85),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* Liquid Retina XDR Display Glass with Outer Rubber Gasket Bezel */
+.macbook-screen-glass {
+  position: relative;
+  background: #000000;
+  border-radius: 18px 18px 0 0;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    inset 0 0 0 2px #000000;
+}
+
+/* Specular diagonal glass sheen reflection */
+.macbook-glass-glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.065) 0%, rgba(255, 255, 255, 0.015) 30%, transparent 55%);
+  pointer-events: none;
+  z-index: 25;
 }
 
 .macbook-bezel {
   position: relative;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #000;
-  min-height: 480px;
+  background: #000000;
+  min-height: 520px;
   display: flex;
   flex-direction: column;
 }
 
-/* Simulated Menu Bar */
+/* Simulated macOS Menu Bar */
 .simulated-menubar {
   height: 32px;
-  background: rgba(15, 17, 23, 0.85);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  background: rgba(18, 20, 26, 0.82);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  font-size: 12.5px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
+  padding: 0 18px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.85);
   position: relative;
   z-index: 20;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.menubar-left, .menubar-right {
+.menubar-left {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
+}
+
+.menubar-right {
+  display: flex;
+  align-items: center;
+  gap: 13px;
 }
 
 .apple-menu-logo {
   font-size: 14px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .menubar-item {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.72);
   cursor: default;
+  transition: color 0.15s ease;
 }
 
-.menubar-item.active {
-  color: #fff;
-  font-weight: 700;
+.menubar-item:hover, .menubar-item.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.menubar-symbol {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.menubar-battery {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.battery-pct {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  font-variant-numeric: tabular-nums;
 }
 
 .menubar-time {
   font-variant-numeric: tabular-nums;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin-left: 2px;
+}
+
+/* MacBook Pro Aluminum Chassis Bottom Chin */
+.macbook-chassis-bottom {
+  position: relative;
+  height: 22px;
+  background: linear-gradient(180deg, #181a20 0%, #252831 40%, #121417 100%);
+  border-radius: 0 0 22px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  margin-top: -1px;
+  z-index: 5;
+}
+
+.macbook-hinge-bar {
+  width: 100%;
+  height: 3px;
+  background: #0b0c0f;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.macbook-front-lip {
+  width: 100%;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* MacBook Pro Thumb Notch Opening Groove */
+.macbook-thumb-groove {
+  position: absolute;
+  top: 0;
+  width: 125px;
+  height: 5.5px;
+  background: linear-gradient(180deg, #0c0d10 0%, #1a1c22 100%);
+  border-radius: 0 0 7px 7px;
+  box-shadow: inset 0 1.5px 2px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.macbook-brand-engraving {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.32);
+  text-transform: uppercase;
+  margin-top: 5px;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.9);
+}
+
+/* Physical Ambient Desk Drop Shadow */
+.macbook-ambient-shadow {
+  position: absolute;
+  bottom: -25px;
+  left: 4%;
+  right: 4%;
+  height: 36px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.5) 45%, transparent 75%);
+  filter: blur(16px);
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Island Anchor / Notch Placement */
@@ -1153,54 +1287,82 @@ body {
   opacity: 0.9;
 }
 
+/* Authentic macOS Floating Glass Dock */
 .desktop-dock {
   position: relative;
-  z-index: 5;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 18px;
-  padding: 6px 12px;
+  z-index: 22;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(35px) saturate(180%);
+  -webkit-backdrop-filter: blur(35px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-top-color: rgba(255, 255, 255, 0.42);
+  border-radius: 20px;
+  padding: 5px 8px;
   display: flex;
+  align-items: flex-end;
+  gap: 9px;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.55), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.dock-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.dock-item:hover {
+  transform: translateY(-8px) scale(1.18);
 }
 
 .dock-icon {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  color: #fff;
   position: relative;
-  cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.2s ease;
 }
 
 .dock-icon:hover {
-  transform: translateY(-8px) scale(1.15);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+.dock-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .dock-app-icon {
-  width: 100%;
-  height: 100%;
+  width: 42px;
+  height: 42px;
   border-radius: 10px;
   object-fit: cover;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
 }
 
 .dock-active-dot {
-  position: absolute;
-  bottom: -4px;
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.95);
+  margin-top: 3px;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+}
+
+.dock-separator {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 2px 4px 2px;
 }
 
 .interactive-controls-footer {
