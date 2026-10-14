@@ -428,6 +428,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 7c. Install Method Switcher & Clipboard Copy
+  const installTabs = document.querySelectorAll('.install-tab-btn');
+  const installPanels = document.querySelectorAll('.install-method-panel');
+
+  installTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetMethod = tab.dataset.method;
+      installTabs.forEach(t => t.classList.toggle('active', t === tab));
+      installPanels.forEach(p => p.classList.toggle('active', p.id === 'panel-method-' + targetMethod));
+    });
+  });
+
+  function setupCopyBtn(btnId, textId) {
+    const btn = document.getElementById(btnId);
+    const codeEl = document.getElementById(textId);
+    if (!btn || !codeEl) return;
+    btn.addEventListener('click', () => {
+      const text = codeEl.textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const label = btn.querySelector('.copy-label');
+        if (label) {
+          const old = label.textContent;
+          label.textContent = 'Copied!';
+          setTimeout(() => label.textContent = old, 2000);
+        }
+      });
+    });
+  }
+
+  setupCopyBtn('copy-brew-cmd', 'brew-code-text');
+  setupCopyBtn('copy-curl-cmd', 'curl-code-text');
+
   // 8. Live Simulated Clock
   function updateClock() {
     const now = new Date();
