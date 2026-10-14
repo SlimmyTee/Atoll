@@ -1,10 +1,10 @@
 cask "atoll" do
-  version "1.2.0"
+  version "1.0.0"
   sha256 "33a9725a5663dcab549360a5c1a0825155e31d12dfa1d06a38b9e9b4a6baa318"
 
-  url "https://atoll-nine.vercel.app/downloads/Atoll.dmg"
+  url "https://github.com/SlimmyTee/Atoll/releases/download/v#{version}/Atoll.dmg"
   name "Atoll"
-  desc "Dynamic Island for your Mac"
+  desc "Native Dynamic Island for macOS"
   homepage "https://atoll-nine.vercel.app/"
 
   app "Atoll.app"
@@ -18,5 +18,6 @@ cask "atoll" do
   zap trash: [
     "~/Library/Application Support/DynamicIsland",
     "~/Library/Preferences/com.danielumoren.dynamicisland.plist",
+    "~/Library/Preferences/app.atoll.desktop.plist",
   ]
 end
