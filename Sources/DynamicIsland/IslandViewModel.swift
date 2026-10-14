@@ -317,9 +317,25 @@ public class IslandViewModel: ObservableObject {
     }
     
     public func lockScreen() {
-        let task = Process()
-        task.launchPath = "/usr/bin/pmset"
-        task.arguments = ["displaysleepnow"]
-        try? task.run()
+        // Collapse the island so it is neat when returning
+        self.isExpanded = false
+        
+        // Method 1: Private login.framework SACLockScreenImmediate (immediate authentic macOS lock screen)
+        typealias SACLockScreenImmediateFunc = @convention(c) () -> Void
+        if let handle = dlopen("/System/Library/PrivateFrameworks/login.framework/Versions/Current/login", RTLD_LAZY) {
+            defer { dlclose(handle) }
+            if let sym = dlsym(handle, "SACLockScreenImmediate") {
+                let lockFunc = unsafeBitCast(sym, to: SACLockScreenImmediateFunc.self)
+                lockFunc()
+                return
+            }
+        }
+        
+        // Method 2: Fallback to System Events shortcut (Control + Command + Q)
+        let script = "tell application \"System Events\" to keystroke \"q\" using {control down, command down}"
+        if let scriptObj = NSAppleScript(source: script) {
+            var error: NSDictionary?
+            _ = scriptObj.executeAndReturnError(&error)
+        }
     }
 }

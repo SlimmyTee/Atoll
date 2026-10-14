@@ -112,6 +112,10 @@
               <span class="brew-benefit-tag">🚀 <strong>Auto-installs:</strong> Ready in /Applications in 3 seconds</span>
               <span class="brew-benefit-tag">🔒 <strong>100% Native Swift</strong></span>
             </div>
+            <div class="terminal-uninstall-note">
+              <span>To uninstall anytime:</span>
+              <code>curl -sSL https://atoll-nine.vercel.app/uninstall.sh | bash</code>
+            </div>
           </div>
 
           <!-- Method 2: Homebrew Cask -->
@@ -134,6 +138,10 @@
             <div class="brew-benefits-row">
               <span class="brew-benefit-tag">⚡️ <strong>Zero warnings:</strong> Gatekeeper auto-handled</span>
               <span class="brew-benefit-tag">🔄 <strong>Auto-updates:</strong> Updates with <code>brew upgrade</code></span>
+            </div>
+            <div class="terminal-uninstall-note">
+              <span>To uninstall anytime:</span>
+              <code>brew uninstall --cask atoll</code>
             </div>
           </div>
 
@@ -887,6 +895,23 @@
             </button>
             <div class="faq-answer">
               <p>Never. Atoll is 100% offline. Calendar access uses Apple’s native EventKit APIs strictly on your device to display meeting links. No analytics, no telemetry, and no account required.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" id="faq-uninstall">
+            <button class="faq-question" id="faq-btn-uninstall">
+              <span>How do I completely uninstall Atoll?</span>
+              <span class="faq-chevron">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+              </span>
+            </button>
+            <div class="faq-answer">
+              <p>You can cleanly uninstall Atoll with a single command:</p>
+              <p><strong>If installed via Terminal 1-Liner or Direct DMG:</strong></p>
+              <pre class="faq-code-block"><code>curl -sSL https://atoll-nine.vercel.app/uninstall.sh | bash</code></pre>
+              <p><strong>If installed via Homebrew:</strong></p>
+              <pre class="faq-code-block"><code>brew uninstall --cask atoll</code></pre>
+              <p>This terminates running instances, deletes <code>/Applications/Atoll.app</code>, and removes all cache and preference files without leaving any residual data.</p>
             </div>
           </div>
         </div>
