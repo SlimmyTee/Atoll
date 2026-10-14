@@ -4,8 +4,8 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd "$DIR"
 
-echo "🔨 Building DynamicIsland (Release mode)..."
-swift build -c release
+echo "🔨 Building DynamicIsland (Release mode - Universal Binary: arm64 + x86_64)..."
+swift build -c release --arch arm64 --arch x86_64
 
 APP_NAME="DynamicIsland.app"
 APP_DIR="$DIR/$APP_NAME"
@@ -17,8 +17,14 @@ echo "📦 Updating $APP_NAME bundle..."
 mkdir -p "$MACOS_DIR"
 mkdir -p "$RESOURCES_DIR"
 
-# Copy binary
-cp "$DIR/.build/release/DynamicIsland" "$MACOS_DIR/DynamicIsland"
+# Copy binary (handles universal build output directory or standard release directory)
+if [ -f "$DIR/.build/out/Products/Release/DynamicIsland" ]; then
+    cp "$DIR/.build/out/Products/Release/DynamicIsland" "$MACOS_DIR/DynamicIsland"
+elif [ -f "$DIR/.build/apple/Products/Release/DynamicIsland" ]; then
+    cp "$DIR/.build/apple/Products/Release/DynamicIsland" "$MACOS_DIR/DynamicIsland"
+else
+    cp "$DIR/.build/release/DynamicIsland" "$MACOS_DIR/DynamicIsland"
+fi
 chmod +x "$MACOS_DIR/DynamicIsland"
 
 # Copy Icon
