@@ -168,7 +168,7 @@
                 </div>
                 <div class="mini-step">
                   <span class="step-num">3</span>
-                  <span>Click <strong>"Open Anyway"</strong> (or Right-Click DMG > Open)</span>
+                  <span>Click <strong>"Open Anyway"</strong> in Security Settings</span>
                 </div>
               </div>
             </div>
@@ -835,10 +835,10 @@
               <p>Atoll is free, open-source software built independently without Apple's /year developer fee. Because of this, macOS Gatekeeper shows a standard security alert for downloaded files.</p>
               <p>To open it in 5 seconds:</p>
               <ol style="margin-left: 20px; line-height: 1.8;">
-                <li>Click <strong>Done</strong> on the warning dialog (do not move to bin).</li>
+                <li>On the alert dialog, click <strong>Done</strong> or <strong>Cancel</strong> (do not move to trash).</li>
                 <li>Open <strong>System Settings > Privacy & Security</strong>.</li>
-                <li>Scroll down to the <strong>Security</strong> section and click <strong>"Open Anyway"</strong> next to Atoll.</li>
-                <li>Alternatively, right-click (or Control-click) <code>Atoll.dmg</code> in Finder and select <strong>Open</strong>.</li>
+                <li>Scroll down to the <strong>Security</strong> section and click <strong>"Open Anyway"</strong> next to Atoll (in macOS 15 Sequoia, Apple requires this setting instead of right-click).</li>
+                <li><em>Quick Terminal shortcut:</em> Run <code>xattr -cr /Applications/Atoll.app</code> to permanently allow it.</li>
               </ol>
             </div>
           </div>
