@@ -650,7 +650,7 @@ body {
 }
 
 .dynamic-island-pill.expanded {
-  width: 610px;
+  width: 620px;
   height: 196px;
   border-radius: 20px;
   margin-top: 6px;
@@ -813,29 +813,33 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 14px;
   height: 112px;
+  min-width: 0;
 }
 
 .media-card {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   background: rgba(255, 255, 255, 0.04);
-  padding: 8px 10px;
+  padding: 9px 11px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  min-width: 0;
+  height: 100%;
 }
 
 .media-art-container {
   position: relative;
-  width: 68px;
-  height: 68px;
+  width: 62px;
+  height: 62px;
   flex-shrink: 0;
 }
 
 .media-artwork {
-  width: 68px;
-  height: 68px;
-  border-radius: 10px;
+  width: 62px;
+  height: 62px;
+  border-radius: 9px;
   object-fit: cover;
   position: relative;
   z-index: 2;
@@ -854,14 +858,23 @@ body {
 .media-details {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .media-title-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 6px;
   margin-bottom: 4px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.media-meta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .track-title {
@@ -871,6 +884,8 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin: 0;
+  line-height: 1.25;
 }
 
 .track-artist {
@@ -879,19 +894,23 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin: 1px 0 0;
+  line-height: 1.2;
 }
 
 .source-badge {
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 10px;
-  background: rgba(16, 185, 129, 0.15);
+  padding: 1.5px 6px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.25);
   color: #10b981;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3.5px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .source-dot {
