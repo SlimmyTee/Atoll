@@ -153,12 +153,11 @@
                   <span class="copy-label">Copy</span>
                 </button>
               </div>
-              <pre class="terminal-code"><code id="brew-code-text">brew install --cask slimmytee/atoll/atoll</code></pre>
+              <pre class="terminal-code"><code id="brew-code-text">brew install --cask https://atoll-nine.vercel.app/atoll.rb</code></pre>
             </div>
             <div class="brew-benefits-row">
-              <span>⚡️ <strong>Zero warnings:</strong> Homebrew manages permissions automatically</span>
-              <span>•</span>
-              <span>🔄 <strong>Auto-updates:</strong> Stays updated with <code>brew upgrade</code></span>
+              <span class="brew-benefit-tag">⚡️ <strong>Zero warnings:</strong> Gatekeeper auto-handled</span>
+              <span class="brew-benefit-tag">🔄 <strong>Auto-updates:</strong> Updates with <code>brew upgrade</code></span>
             </div>
           </div>
 
@@ -362,12 +361,22 @@
                       <!-- Right: Upcoming Meeting HUD -->
                       <div class="meeting-card">
                         <div class="meeting-header-row">
-                          <span class="meeting-badge live">Happening now</span>
+                          <div class="meeting-status-tag">
+                            <span class="status-pulse-dot"></span>
+                            <span class="meeting-badge live">HAPPENING NOW</span>
+                          </div>
                           <span class="platform-badge meet">Google Meet</span>
-                          <span class="account-email-badge">danielumoren@enyata.com</span>
                         </div>
-                        <h4 class="meeting-title">Design Sprint • Atoll UI</h4>
-                        <p class="meeting-time">8:30 PM – 9:15 PM • With 4 team members</p>
+                        <div class="meeting-body">
+                          <h4 class="meeting-title">Design Sprint • Atoll UI</h4>
+                          <div class="meeting-meta-row">
+                            <span class="meeting-time">8:30 PM – 9:15 PM</span>
+                            <span class="account-pill" title="Chrome profile">
+                              <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                              alex@company.com
+                            </span>
+                          </div>
+                        </div>
                         <button class="join-call-btn" id="btn-join-meeting">
                           <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
                           <span>Join in Chrome (Existing Tab)</span>
@@ -448,7 +457,7 @@
               <img src="assets/wallpaper.jpg" alt="macOS Wallpaper" class="wallpaper-img">
               <div class="meeting-toast-feedback" id="meeting-toast">
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="#34c759"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                <span>Focused existing Chrome tab • Account: <strong>danielumoren@enyata.com</strong></span>
+                <span>Focused existing Chrome tab • Account: <strong>alex@company.com</strong></span>
               </div>
               <div class="desktop-dock">
                 <!-- Finder -->
@@ -903,7 +912,7 @@
           </div>
 
           <p class="cta-checksum">
-            Universal DMG Build • Code signed with designated identifier <code class="code-pill">com.danielumoren.dynamicisland</code>
+            Universal DMG Build • Code signed with designated identifier <code class="code-pill">app.atoll.desktop</code>
           </p>
         </div>
       </div>

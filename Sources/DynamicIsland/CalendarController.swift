@@ -409,7 +409,7 @@ public class CalendarController: ObservableObject {
             }
         }
         
-        // 2. Calendar title (e.g. "danielumoren@enyata.com")
+        // 2. Calendar title (e.g. "user@company.com")
         let calTitle = event.calendar.title.trimmingCharacters(in: .whitespacesAndNewlines)
         if isValidEmail(calTitle) {
             return calTitle

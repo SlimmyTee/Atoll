@@ -650,8 +650,8 @@ body {
 }
 
 .dynamic-island-pill.expanded {
-  width: 580px;
-  height: 180px;
+  width: 610px;
+  height: 196px;
   border-radius: 20px;
   margin-top: 6px;
   border-color: rgba(255, 255, 255, 0.18);
@@ -810,9 +810,9 @@ body {
 /* Dashboard Panel (Music & Meeting) */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 12px;
-  height: 98px;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  height: 112px;
 }
 
 .media-card {
@@ -987,11 +987,12 @@ body {
 .meeting-card {
   background: rgba(255, 255, 255, 0.04);
   border-radius: 12px;
-  padding: 8px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  height: 100%;
 }
 
 .meeting-header-row {
@@ -1000,48 +1001,107 @@ body {
   align-items: center;
 }
 
-.meeting-badge {
-  font-size: 9px;
+.meeting-status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+  animation: liveDotPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes liveDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.meeting-badge.live {
+  font-size: 9.5px;
   font-weight: 800;
   text-transform: uppercase;
   color: #ef4444;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
-.platform-badge {
+.platform-badge.meet {
   font-size: 9.5px;
   font-weight: 700;
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.15);
-  padding: 2px 6px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 2px 7px;
   border-radius: 6px;
+  white-space: nowrap;
+}
+
+.meeting-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 2px 0;
 }
 
 .meeting-title {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   color: #fff;
-  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.meeting-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .meeting-time {
-  font-size: 10px;
+  font-size: 10.5px;
   color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+}
+
+.account-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 1.5px 6px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
 }
 
 .join-call-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   background: #2563eb;
   color: #fff;
   text-decoration: none;
   font-size: 11px;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 5px 10px;
   border-radius: 8px;
   transition: all 0.2s ease;
   width: 100%;
+  border: none;
+  cursor: pointer;
 }
 
 .join-call-btn:hover {
@@ -2032,12 +2092,23 @@ body {
 
 .brew-benefits-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   margin-top: 14px;
+}
+
+.brew-benefit-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 @media (max-width: 640px) {
