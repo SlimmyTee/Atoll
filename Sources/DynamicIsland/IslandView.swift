@@ -12,21 +12,54 @@ public struct IslandView: View {
     public var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                // Background Pill
-                RoundedRectangle(
-                    cornerRadius: vm.isExpanded ? 20 : 16,
-                    style: .continuous
-                )
-                .fill(Color.black)
-                .overlay(
+                // 1. Clipped Base & Content (Guarantees album art and widgets never spill outside the pill)
+                ZStack {
                     RoundedRectangle(
                         cornerRadius: vm.isExpanded ? 20 : 16,
                         style: .continuous
                     )
-                    .strokeBorder(
-                        isTargetedForDrop ? Color.cyan.opacity(0.8) : Color.white.opacity(vm.isExpanded ? 0.12 : 0.05),
-                        lineWidth: isTargetedForDrop ? 2 : 1
+                    .fill(Color.black)
+                    
+                    // Content Switcher
+                    if vm.isExpanded {
+                        expandedContent
+                            .transition(
+                                .asymmetric(
+                                    insertion: .opacity
+                                        .combined(with: .scale(scale: 0.96, anchor: .top))
+                                        .animation(.easeOut(duration: 0.16).delay(0.06)),
+                                    removal: .opacity
+                                        .combined(with: .scale(scale: 0.96, anchor: .top))
+                                        .animation(.easeIn(duration: 0.10))
+                                )
+                            )
+                    } else {
+                        compactContent
+                            .transition(
+                                .asymmetric(
+                                    insertion: .opacity
+                                        .animation(.easeOut(duration: 0.14).delay(0.08)),
+                                    removal: .opacity
+                                        .animation(.easeIn(duration: 0.08))
+                                )
+                            )
+                    }
+                }
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: vm.isExpanded ? 20 : 16,
+                        style: .continuous
                     )
+                )
+                
+                // 2. Outer Border & Natural Diffusion Shadow (Unclipped)
+                RoundedRectangle(
+                    cornerRadius: vm.isExpanded ? 20 : 16,
+                    style: .continuous
+                )
+                .strokeBorder(
+                    isTargetedForDrop ? Color.cyan.opacity(0.8) : Color.white.opacity(vm.isExpanded ? 0.12 : 0.05),
+                    lineWidth: isTargetedForDrop ? 2 : 1
                 )
                 .shadow(
                     color: Color.black.opacity(vm.isExpanded ? 0.5 : 0.1),
@@ -34,22 +67,11 @@ public struct IslandView: View {
                     x: 0,
                     y: vm.isExpanded ? 8 : 2
                 )
-                
-                // Content Switcher
-                if vm.isExpanded {
-                    expandedContent
-                        .transition(.asymmetric(
-                            insertion: .opacity.combined(with: .scale(scale: 0.95, anchor: .top)),
-                            removal: .opacity
-                        ))
-                } else {
-                    compactContent
-                        .transition(.opacity)
-                }
+                .allowsHitTesting(false)
             }
             .frame(width: islandWidth, height: islandHeight)
-            .animation(.spring(response: 0.32, dampingFraction: 0.78), value: vm.isExpanded)
-            .animation(.spring(response: 0.32, dampingFraction: 0.78), value: islandWidth)
+            .animation(.spring(response: 0.32, dampingFraction: 0.82), value: vm.isExpanded)
+            .animation(.spring(response: 0.32, dampingFraction: 0.82), value: islandWidth)
             .onHover { hovering in
                 if hovering {
                     vm.onMouseEnter()
@@ -599,8 +621,9 @@ struct DashboardSplitView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                                 .frame(width: 44, height: 44)
-                                .blur(radius: 8)
-                                .opacity(0.4)
+                                .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+                                .blur(radius: 6)
+                                .opacity(0.35)
                             
                             Image(nsImage: nsImage)
                                 .resizable()

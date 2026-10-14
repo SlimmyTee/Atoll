@@ -175,7 +175,7 @@ public class IslandViewModel: ObservableObject {
     
     public func dismissMeetingAlert() {
         meetingAlertDismissTimer?.cancel()
-        withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
+        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
             self.activeMeetingAlert = nil
             if !self.isHovered && !self.isPinned {
                 self.isExpanded = false
@@ -201,14 +201,14 @@ public class IslandViewModel: ObservableObject {
         dwellTimer?.cancel()
         let timerItem = DispatchWorkItem { [weak self] in
             guard let self = self, self.isExpanded else { return }
-            withAnimation(.spring(response: 0.36, dampingFraction: 0.78)) {
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
                 self.isDwellExpanded = true
             }
         }
         dwellTimer = timerItem
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.8, execute: timerItem)
         
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
             self.isExpanded = true
         }
     }
@@ -223,7 +223,7 @@ public class IslandViewModel: ObservableObject {
         collapseWorkItem?.cancel()
         let workItem = DispatchWorkItem { [weak self] in
             guard let self = self, !self.isPinned else { return }
-            withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
                 self.isExpanded = false
                 self.isDwellExpanded = false
             }
@@ -235,7 +235,7 @@ public class IslandViewModel: ObservableObject {
     
     public func toggleExpand() {
         collapseWorkItem?.cancel()
-        withAnimation(.spring(response: 0.36, dampingFraction: 0.78)) {
+        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
             self.isExpanded.toggle()
         }
     }

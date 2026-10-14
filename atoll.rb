@@ -1,6 +1,6 @@
 cask "atoll" do
   version "1.0.0"
-  sha256 "71c1dbcac4039f721fa5716f930157e54949c76b16f8e21fe4b5a2cb7c2830b3"
+  sha256 "1b05fd5c55c7f1663969f0fd2ea83ca6398529873864157f4e96ab53df87e9ae"
 
   url "https://github.com/SlimmyTee/Atoll/releases/download/v#{version}/Atoll.dmg"
   name "Atoll"

@@ -718,20 +718,43 @@ body {
   50% { transform: scaleY(1); }
 }
 
-/* Expanded Island Content */
-.island-expanded-view {
-  display: none;
-  flex-direction: column;
-  height: 100%;
-  padding: 8px 14px 10px;
+/* Compact Island View with Seamless Opacity Transition */
+.island-compact-view {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding: 0 10px;
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.12s ease 0.14s, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1) 0.14s;
+  pointer-events: auto;
 }
 
 .dynamic-island-pill.expanded .island-compact-view {
-  display: none;
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
+  transition: opacity 0.08s ease, transform 0.1s ease;
+}
+
+/* Expanded Island Content with Seamless Fade and Clip */
+.island-expanded-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px 14px 10px;
+  opacity: 0;
+  transform: scale(0.96) translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.10s ease, transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dynamic-island-pill.expanded .island-expanded-view {
-  display: flex;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+  transition: opacity 0.18s ease 0.08s, transform 0.26s cubic-bezier(0.16, 1, 0.3, 1) 0.08s;
 }
 
 /* Island Tab Header */
