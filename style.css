@@ -1743,3 +1743,55 @@ body {
   .dynamic-island-pill.compact { width: 220px; }
   .compact-notch-gap { width: 130px; }
 }
+
+/* Meeting Alert Heads-Up & Smart Chrome Account Routing */
+.account-email-badge {
+  font-size: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 2px 7px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.mode-pill.highlight {
+  border-color: rgba(52, 199, 89, 0.4);
+  color: #34c759;
+}
+
+.mode-pill.highlight:hover, .mode-pill.highlight.active {
+  background: rgba(52, 199, 89, 0.15);
+  border-color: #34c759;
+  color: #fff;
+}
+
+.meeting-toast-feedback {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(20, 22, 28, 0.94);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(52, 199, 89, 0.5);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.8), 0 0 25px rgba(52, 199, 89, 0.25);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+  white-space: nowrap;
+}
+
+.meeting-toast-feedback.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

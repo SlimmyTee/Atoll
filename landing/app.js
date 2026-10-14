@@ -396,6 +396,38 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 7b. Smart Meeting Launcher & Chrome Multi-Account Toast
+  const btnJoinMeeting = document.getElementById('btn-join-meeting');
+  const meetingToast = document.getElementById('meeting-toast');
+  const demoAlertBtn = document.getElementById('demo-tab-alert');
+
+  if (btnJoinMeeting && meetingToast) {
+    btnJoinMeeting.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      meetingToast.classList.add('visible');
+      setTimeout(() => {
+        meetingToast.classList.remove('visible');
+      }, 3500);
+    });
+  }
+
+  if (demoAlertBtn) {
+    demoAlertBtn.addEventListener('click', () => {
+      switchTab('dashboard');
+      expandIsland();
+      if (meetingToast) {
+        meetingToast.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="#34c759"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>🔔 Meeting starting in 1 min • Auto-popped from notch</span>';
+        meetingToast.classList.add('visible');
+        setTimeout(() => meetingToast.classList.remove('visible'), 4000);
+      }
+      // Auto-collapse after 8 seconds if not pinned or hovered
+      setTimeout(() => {
+        collapseIsland();
+      }, 8000);
+    });
+  }
+
   // 8. Live Simulated Clock
   function updateClock() {
     const now = new Date();

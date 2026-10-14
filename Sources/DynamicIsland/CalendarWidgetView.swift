@@ -58,7 +58,7 @@ public struct CalendarWidgetView: View {
                     // Join Call / Action Button
                     if let link = next.meetingLink {
                         Button(action: {
-                            CalendarController.openMeeting(url: link)
+                            CalendarController.openMeeting(url: link, accountEmail: next.accountEmail)
                         }) {
                             HStack(spacing: 5) {
                                 Image(systemName: "video.fill")
@@ -109,7 +109,7 @@ public struct CalendarWidgetView: View {
                                     }
                                     
                                     if let link = item.meetingLink {
-                                        Button(action: { CalendarController.openMeeting(url: link) }) {
+                                        Button(action: { CalendarController.openMeeting(url: link, accountEmail: item.accountEmail) }) {
                                             Image(systemName: "video.circle.fill")
                                                 .font(.system(size: 14))
                                                 .foregroundColor(.cyan)

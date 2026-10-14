@@ -311,7 +311,9 @@ struct DashboardSplitView: View {
     
     var body: some View {
         VStack(spacing: 5) {
-            if vm.isCompactDashboard {
+            if let alert = vm.activeMeetingAlert {
+                meetingAlertBanner(alert: alert)
+            } else if vm.isCompactDashboard {
                 compactContent
             } else {
                 fullContent
@@ -319,6 +321,98 @@ struct DashboardSplitView: View {
             
             bottomUtilityRow
         }
+    }
+    
+    private func meetingAlertBanner(alert: MeetingEvent) -> some View {
+        HStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(Color.green.opacity(0.2))
+                    .frame(width: 32, height: 32)
+                
+                Image(systemName: "video.fill")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(.green)
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 5) {
+                    Text("STARTING NOW")
+                        .font(.system(size: 8, weight: .heavy, design: .rounded))
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 4.5)
+                        .padding(.vertical, 1.5)
+                        .background(Color.green.opacity(0.18))
+                        .clipShape(Capsule())
+                    
+                    if let platform = alert.videoPlatformName {
+                        Text(platform)
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                    
+                    if let email = alert.accountEmail {
+                        Text("• \(email)")
+                            .font(.system(size: 8.5, design: .monospaced))
+                            .foregroundColor(.white.opacity(0.5))
+                            .lineLimit(1)
+                    }
+                }
+                
+                Text(alert.title)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+            }
+            
+            Spacer()
+            
+            Button(action: {
+                vm.joinActiveMeetingAlert()
+            }) {
+                HStack(spacing: 4) {
+                    Image(systemName: "video.fill")
+                        .font(.system(size: 9))
+                    Text("Join Call")
+                        .font(.system(size: 10.5, weight: .bold))
+                }
+                .foregroundColor(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(
+                    LinearGradient(
+                        colors: [Color.blue, Color.purple],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .clipShape(Capsule())
+                .shadow(color: Color.blue.opacity(0.5), radius: 6, x: 0, y: 2)
+            }
+            .buttonStyle(.plain)
+            
+            Button(action: {
+                vm.dismissMeetingAlert()
+            }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 8.5, weight: .bold))
+                    .foregroundColor(.white.opacity(0.4))
+                    .padding(4)
+                    .background(Color.white.opacity(0.08))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .fill(Color.white.opacity(0.07))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 11, style: .continuous)
+                        .strokeBorder(Color.green.opacity(0.35), lineWidth: 1)
+                )
+        )
     }
     
     private var compactContent: some View {
@@ -544,7 +638,7 @@ struct DashboardSplitView: View {
                         Spacer()
                         
                         if next.canJoinNow, let link = next.meetingLink {
-                            Button(action: { CalendarController.openMeeting(url: link) }) {
+                            Button(action: { CalendarController.openMeeting(url: link, accountEmail: next.accountEmail) }) {
                                 HStack(spacing: 4) {
                                     Image(systemName: "video.fill")
                                         .font(.system(size: 8.5))

@@ -41,6 +41,11 @@ public class IslandViewModel: ObservableObject {
     @Published public var isDwellExpanded: Bool = false
     private var dwellTimer: DispatchWorkItem?
     
+    // Meeting Alert Heads-Up
+    @Published public var activeMeetingAlert: MeetingEvent? = nil
+    @Published public var isHovered: Bool = false
+    private var meetingAlertDismissTimer: DispatchWorkItem?
+    
     public var hasImminentMeeting: Bool {
         guard let meeting = calendar.nextMeeting else { return false }
         return meeting.isImminent
@@ -126,10 +131,57 @@ public class IslandViewModel: ObservableObject {
             }
             .store(in: &cancellables)
         
+        calendar.onMeetingAlert = { [weak self] meeting in
+            Task { @MainActor in
+                self?.triggerMeetingAlert(for: meeting)
+            }
+        }
+        
         checkMuteState()
     }
     
+    public func triggerMeetingAlert(for meeting: MeetingEvent) {
+        meetingAlertDismissTimer?.cancel()
+        
+        withAnimation(.spring(response: 0.38, dampingFraction: 0.76)) {
+            self.activeMeetingAlert = meeting
+            self.activeTab = .dashboard
+            self.isExpanded = true
+        }
+        
+        // Auto-dismiss after 9.5 seconds if user does not hover or click
+        let dismissItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            if !self.isHovered && !self.isPinned {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.82)) {
+                    self.activeMeetingAlert = nil
+                    self.isExpanded = false
+                }
+            }
+        }
+        self.meetingAlertDismissTimer = dismissItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 9.5, execute: dismissItem)
+    }
+    
+    public func dismissMeetingAlert() {
+        meetingAlertDismissTimer?.cancel()
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
+            self.activeMeetingAlert = nil
+            if !self.isHovered && !self.isPinned {
+                self.isExpanded = false
+            }
+        }
+    }
+    
+    public func joinActiveMeetingAlert() {
+        guard let alert = activeMeetingAlert, let link = alert.meetingLink else { return }
+        CalendarController.openMeeting(url: link, accountEmail: alert.accountEmail)
+        dismissMeetingAlert()
+    }
+
     public func onMouseEnter() {
+        isHovered = true
+        meetingAlertDismissTimer?.cancel()
         collapseWorkItem?.cancel()
         collapseWorkItem = nil
         checkMuteState()
@@ -152,6 +204,7 @@ public class IslandViewModel: ObservableObject {
     }
     
     public func onMouseLeave() {
+        isHovered = false
         dwellTimer?.cancel()
         dwellTimer = nil
         
