@@ -307,6 +307,7 @@ public class CalendarController: ObservableObject {
     }
     
     public func requestAccess() {
+        self.eventStore = EKEventStore()
         let status = EKEventStore.authorizationStatus(for: .event)
         if status == .denied || status == .restricted {
             openCalendarSettings()
