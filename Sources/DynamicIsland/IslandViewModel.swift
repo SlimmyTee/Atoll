@@ -43,6 +43,16 @@ public class IslandViewModel: ObservableObject {
     
     // Meeting Alert Heads-Up
     @Published public var activeMeetingAlert: MeetingEvent? = nil
+    
+    // Auto-Update Manager
+    @Published public var updater: UpdateManager = UpdateManager.shared
+    
+    public func simulateUpdateNotification() {
+        updater.isUpdateAvailable = true
+        updater.latestVersion = "v1.1.0"
+        updater.isDismissed = false
+        self.isExpanded = true
+    }
     @Published public var isHovered: Bool = false
     private var meetingAlertDismissTimer: DispatchWorkItem?
     

@@ -137,6 +137,15 @@ public struct IslandView: View {
                 if isTargetedForDrop {
                     Image(systemName: "plus.circle.fill")
                         .foregroundColor(.cyan)
+                } else if vm.updater.isUpdateAvailable && !vm.updater.isDismissed {
+                    HStack(spacing: 2) {
+                        Circle()
+                            .fill(Color.cyan)
+                            .frame(width: 5, height: 5)
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.system(size: 8.5))
+                            .foregroundColor(.cyan)
+                    }
                 } else if vm.isTimerActive {
                     Text(vm.formattedTimer)
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
@@ -311,7 +320,9 @@ struct DashboardSplitView: View {
     
     var body: some View {
         VStack(spacing: 5) {
-            if let alert = vm.activeMeetingAlert {
+            if vm.updater.isUpdateAvailable && !vm.updater.isDismissed {
+                updateAvailableBanner
+            } else if let alert = vm.activeMeetingAlert {
                 meetingAlertBanner(alert: alert)
             } else if vm.isCompactDashboard {
                 compactContent
@@ -323,6 +334,103 @@ struct DashboardSplitView: View {
         }
     }
     
+    private var updateAvailableBanner: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(LinearGradient(colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.3)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: 30, height: 30)
+                
+                Image(systemName: "sparkles")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(Color.cyan)
+            }
+            
+            VStack(alignment: .leading, spacing: 1.5) {
+                HStack(spacing: 5) {
+                    Text("UPDATE AVAILABLE")
+                        .font(.system(size: 8, weight: .heavy, design: .rounded))
+                        .foregroundColor(.cyan)
+                        .padding(.horizontal, 4.5)
+                        .padding(.vertical, 1.5)
+                        .background(Color.cyan.opacity(0.18))
+                        .clipShape(Capsule())
+                    
+                    Text("Atoll \(vm.updater.latestVersion)")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                
+                Text(vm.updater.isUpdating ? vm.updater.updateStatusMessage : "A faster, smoother release is ready.")
+                    .font(.system(size: 9.5))
+                    .foregroundColor(.white.opacity(0.65))
+                    .lineLimit(1)
+            }
+            
+            Spacer()
+            
+            if vm.updater.isUpdating {
+                ProgressView()
+                    .scaleEffect(0.65)
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .padding(.trailing, 6)
+            } else {
+                Button(action: {
+                    vm.updater.triggerUpdate()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.down.circle.fill")
+                            .font(.system(size: 9.5))
+                        Text("Update Now")
+                            .font(.system(size: 10, weight: .bold))
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4.5)
+                    .background(
+                        LinearGradient(
+                            colors: [Color.blue, Color.purple],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .clipShape(Capsule())
+                    .shadow(color: Color.blue.opacity(0.4), radius: 4, x: 0, y: 1.5)
+                }
+                .buttonStyle(.plain)
+                
+                Button(action: {
+                    vm.updater.dismiss()
+                }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 8.5, weight: .bold))
+                        .foregroundColor(.white.opacity(0.4))
+                        .padding(4)
+                        .background(Color.white.opacity(0.08))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .fill(Color.white.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 11, style: .continuous)
+                        .strokeBorder(
+                            LinearGradient(
+                                colors: [Color.blue.opacity(0.5), Color.purple.opacity(0.5)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            lineWidth: 1
+                        )
+                )
+        )
+    }
+
     private func meetingAlertBanner(alert: MeetingEvent) -> some View {
         HStack(spacing: 10) {
             ZStack {

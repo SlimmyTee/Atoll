@@ -219,6 +219,7 @@
             <button class="mode-pill" id="demo-tab-shelf" data-tab="shelf">File Pocket</button>
             <button class="mode-pill" id="demo-tab-timer" data-tab="timer">Focus Timer</button>
             <button class="mode-pill highlight" id="demo-tab-alert" data-tab="alert">🔔 Meeting Alert</button>
+            <button class="mode-pill" id="demo-tab-update" data-tab="update">✨ Update Alert</button>
           </div>
         </div>
 
@@ -319,6 +320,29 @@
 
                   <!-- TAB 1: DASHBOARD (Music & Meeting) -->
                   <div class="island-tab-panel active" id="panel-dashboard">
+                    <!-- UPDATE AVAILABLE HEADS-UP BANNER (Interactive Live Preview) -->
+                    <div class="update-alert-banner" id="demo-update-banner" style="display: none;">
+                      <div class="update-banner-icon">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="#38bdf8"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                      </div>
+                      <div class="update-banner-info">
+                        <div class="update-banner-tags">
+                          <span class="update-pill-badge">UPDATE AVAILABLE</span>
+                          <span class="update-ver-title">Atoll v1.1.0</span>
+                        </div>
+                        <p class="update-banner-sub" id="demo-update-status">Zero-friction OTA update • 1-Click install & auto-restart</p>
+                      </div>
+                      <div class="update-banner-actions">
+                        <button class="btn-update-now" id="btn-demo-update">
+                          <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                          <span id="demo-update-btn-text">Update Now</span>
+                        </button>
+                        <button class="btn-update-dismiss" id="btn-demo-dismiss" title="Dismiss">
+                          <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+
                     <div class="dashboard-grid">
                       <!-- Left: Interactive Music Player -->
                       <div class="media-card">

@@ -453,6 +453,59 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 7b2. Update Notification Demo
+  const demoUpdateBtn = document.getElementById('demo-tab-update');
+  const demoUpdateBanner = document.getElementById('demo-update-banner');
+  const btnDemoUpdate = document.getElementById('btn-demo-update');
+  const btnDemoDismiss = document.getElementById('btn-demo-dismiss');
+  const demoUpdateStatus = document.getElementById('demo-update-status');
+  const demoUpdateBtnText = document.getElementById('demo-update-btn-text');
+
+  if (demoUpdateBtn && demoUpdateBanner) {
+    demoUpdateBtn.addEventListener('click', () => {
+      switchTab('dashboard');
+      expandIsland();
+      demoUpdateBanner.style.display = 'flex';
+      
+      if (meetingToast) {
+        meetingToast.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="#38bdf8"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg><span>✨ Atoll v1.1.0 update available • In-Notch Notification</span>';
+        meetingToast.classList.add('visible');
+        setTimeout(() => meetingToast.classList.remove('visible'), 4000);
+      }
+    });
+
+    if (btnDemoDismiss) {
+      btnDemoDismiss.addEventListener('click', (e) => {
+        e.stopPropagation();
+        demoUpdateBanner.style.display = 'none';
+      });
+    }
+
+    if (btnDemoUpdate) {
+      btnDemoUpdate.addEventListener('click', (e) => {
+        e.stopPropagation();
+        btnDemoUpdate.disabled = true;
+        demoUpdateBtnText.innerText = 'Installing...';
+        demoUpdateStatus.innerText = '⬇️ Downloading Atoll v1.1.0 in background... 68%';
+        
+        setTimeout(() => {
+          demoUpdateStatus.innerText = '⚡️ Swapping app bundle in /Applications...';
+        }, 900);
+
+        setTimeout(() => {
+          demoUpdateStatus.innerText = '✅ Updated to Atoll v1.1.0! Restarting seamless...';
+          demoUpdateBtnText.innerText = 'Up to Date';
+          setTimeout(() => {
+            demoUpdateBanner.style.display = 'none';
+            btnDemoUpdate.disabled = false;
+            demoUpdateBtnText.innerText = 'Update Now';
+            demoUpdateStatus.innerText = 'Zero-friction OTA update • 1-Click install & auto-restart';
+          }, 2000);
+        }, 1800);
+      });
+    }
+  }
+
   // 7c. Install Method Switcher & Clipboard Copy
   const installTabs = document.querySelectorAll('.install-tab-btn');
   const installPanels = document.querySelectorAll('.install-method-panel');
