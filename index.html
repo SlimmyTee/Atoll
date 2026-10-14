@@ -1,973 +1,1018 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/>  <title>Atoll — Dynamic Island for your Mac | Native macOS 14 & 15</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atoll — Dynamic Island for your Mac</title>
-  <meta name="description" content="Turn your Mac's notch into an intelligent, interactive command center. Spotify Connect controls, 1-click meeting joins, temporary file shelf, and focus timer. Native Swift.">
-  <meta name="keywords" content="macos, dynamic island, mac notch, spotify connect, macos app, swift, productivity, atoll">
-  <link rel="icon" type="image/jpeg" href="assets/icon.jpg">
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  
-  <!-- Open Graph -->
+  <meta name="description" content="Turn your camera notch into a fluid, living command deck. Effortless Spotify & Apple Music controls, 1-click meeting joins, temporary drag & drop pocket, and focus timers.">
   <meta property="og:title" content="Atoll — Dynamic Island for your Mac">
-  <meta property="og:description" content="An entirely new way to experience your Mac. Native, fluid, and battery-friendly.">
-  <meta property="og:image" content="assets/wallpaper.jpg">
-  <meta property="og:type" content="website">
-  
+  <meta property="og:description" content="Turn your camera notch into a fluid, living command deck. Native Swift, 0.0% idle CPU, macOS Sonoma & Sequoia.">
+  <meta property="og:image" content="assets/stitch_wallpaper.jpg">
+  <link rel="icon" type="image/png" href="assets/stitch_logo.png">
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-G97ZKWS05T"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-G97ZKWS05T');
+
+    function trackEvent(action, category, label) {
+      if (typeof gtag === 'function') {
+        gtag('event', action, {
+          event_category: category,
+          event_label: label
+        });
+      }
+    }
   </script>
 
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <!-- Ambient Gradient Background -->
-  <div class="ambient-glow glow-top" aria-hidden="true"></div>
-  <div class="ambient-glow glow-bottom" aria-hidden="true"></div>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}
 
-  <!-- Navigation -->
-  <header class="site-header" id="header">
-    <div class="header-container">
-      <a href="#" class="brand-logo" id="nav-brand">
-        <img src="assets/icon.jpg" alt="Atoll Logo" class="logo-img">
-        <span class="brand-name">Atoll</span>
-        <span class="version-badge" id="version-badge">v1.2</span>
-      </a>
+/* MacBook Pro Keyboard Base Styles */
+.macbook-base-chassis {
+  position: relative;
+  width: 100%;
+  perspective: 1400px;
+  z-index: 10;
+  user-select: none;
+}
+.macbook-hinge-section {
+  width: 100%;
+  height: 12px;
+  background: linear-gradient(180deg, #090a0d 0%, #16181f 50%, #0d0e12 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  position: relative;
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.hinge-vent-left, .hinge-vent-right {
+  width: 60px;
+  height: 4px;
+  background: #000000;
+  border-radius: 2px;
+}
+.hinge-barrel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.hinge-brand-engraving {
+  font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif;
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.28);
+  text-transform: uppercase;
+}
+.hinge-sheen {
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
+}
+.macbook-deck-surface {
+  position: relative;
+  background: linear-gradient(180deg, #171920 0%, #20232c 25%, #181a21 70%, #12141a 100%);
+  border-radius: 0 0 26px 26px;
+  padding: 14px 18px 10px 18px;
+  transform: rotateX(6deg);
+  transform-origin: top center;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 2px 0 rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.8);
+}
+.macbook-keyboard-and-speakers {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+}
+.macbook-speaker-grille {
+  width: 34px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background-color: #12141a;
+  background-image: radial-gradient(circle, #000000 0.8px, transparent 0.9px);
+  background-size: 3px 3px;
+  opacity: 0.7;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.macbook-keyboard-well {
+  flex: 1;
+  background: #08090c;
+  border-radius: 8px;
+  padding: 6px 7px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.95), inset 0 0 0 1px #000000;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5px;
+}
+.kb-row {
+  display: flex;
+  gap: 3.5px;
+  width: 100%;
+}
+.row-fn { height: 20px; }
+.row-num, .row-qwerty, .row-asdf, .row-shift, .row-mod { height: 24px; }
+.kb-key {
+  flex: 1;
+  background: linear-gradient(180deg, #1e2027 0%, #14151b 100%);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.85), inset 0 0.5px 0.5px rgba(255, 255, 255, 0.16);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: transform 0.06s ease, background 0.06s ease;
+}
+.kb-key:hover { background: linear-gradient(180deg, #252832 0%, #181a22 100%); color: #fff; }
+.kb-key:active, .kb-key.pressed { transform: translateY(1.2px); background: #111217; }
+.key-label { font-size: 7.5px; font-weight: 500; color: rgba(255, 255, 255, 0.75); }
+.key-main { font-size: 9.5px; font-weight: 500; }
+.key-top { font-size: 7.5px; line-height: 1; color: rgba(255, 255, 255, 0.7); }
+.key-bot { font-size: 8.5px; line-height: 1.1; color: rgba(255, 255, 255, 0.9); }
+.key-icon { font-size: 7.5px; line-height: 1; }
+.key-sub { font-size: 5.5px; font-weight: 600; color: rgba(255, 255, 255, 0.45); }
+.key-esc { flex: 1.5; }
+.key-touchid { flex: 1.35; background: #0e0f14; border-radius: 5px; }
+.touchid-sensor-ring { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.28); }
+.key-delete { flex: 1.5; align-items: flex-end; padding-right: 5px; }
+.key-tab { flex: 1.5; align-items: flex-start; padding-left: 5px; }
+.key-backslash { flex: 1.1; }
+.key-caps { flex: 1.8; align-items: flex-start; padding-left: 5px; position: relative; }
+.caps-led { position: absolute; top: 4px; left: 5px; width: 3px; height: 3px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 4px #22c55e; }
+.key-return { flex: 1.8; align-items: flex-end; padding-right: 5px; }
+.key-lshift, .key-rshift { flex: 2.35; }
+.key-fn, .key-ctrl { flex: 1; }
+.key-lopt, .key-ropt { flex: 1.15; }
+.key-lcmd, .key-rcmd { flex: 1.35; }
+.key-space { flex: 5.6; }
+.key-tactile-bump { position: absolute; bottom: 3px; width: 5px; height: 1px; background: rgba(255, 255, 255, 0.5); border-radius: 0.5px; }
+.kb-arrow-cluster { flex: 3; display: flex; gap: 3px; height: 100%; }
+.key-arrow { font-size: 7px; flex: 1; display: flex; align-items: center; justify-content: center; }
+.kb-arrow-updown { flex: 1; display: flex; flex-direction: column; gap: 2px; height: 100%; }
+.key-arrow-up, .key-arrow-down { height: calc(50% - 1px); }
+.macbook-lower-deck { display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 10px; margin-bottom: 4px; }
+.palmrest-area { flex: 1; }
+.macbook-trackpad {
+  width: 280px; height: 120px; max-width: 36%;
+  background: linear-gradient(180deg, #15171d 0%, #1a1c23 50%, #13151b 100%);
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 1px 2px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+.trackpad-glass-surface { position: absolute; inset: 0; }
+.macbook-base-front-lip { width: 100%; height: 12px; display: flex; align-items: center; justify-content: center; position: relative; margin-top: 3px; }
+.macbook-base-thumb-groove { width: 130px; height: 5px; background: linear-gradient(180deg, #0a0b0d 0%, #1c1f26 100%); border-radius: 0 0 7px 7px; }
+.macbook-base-shadow { position: absolute; bottom: -20px; left: 2%; right: 2%; height: 35px; background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.85) 0%, transparent 75%); filter: blur(10px); pointer-events: none; z-index: -1; }
+</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-glass": "rgba(255, 255, 255, 0.04)", "inverse-on-surface": "#2f3036", "on-background": "#e3e1e9", "surface-container-low": "#1a1b21", "on-secondary-fixed-variant": "#004e5c", "on-surface": "#e3e1e9", "primary-fixed": "#e0e0ff", "outline-variant": "#454653", "inverse-surface": "#e3e1e9", "on-error-container": "#ffdad6", "surface-bright": "#38393f", "on-tertiary-fixed-variant": "#005236", "electric-cyan": "#38BDF8", "on-primary-container": "#101b8a", "surface-variant": "#34343a", "neon-violet": "#A855F7", "secondary-fixed": "#acedff", "outline": "#908f9e", "on-primary-fixed": "#000767", "on-primary-fixed-variant": "#2f3aa3", "on-surface-variant": "#c6c5d5", "inverse-primary": "#4953bc", "primary": "#bdc2ff", "tertiary-fixed-dim": "#4edea3", "surface-container-high": "#292a2f", "primary-fixed-dim": "#bdc2ff", "error-container": "#93000a", "glow-aurora": "linear-gradient(135deg, #A855F7 0%, #06B6D4 50%, #10B981 100%)", "on-secondary-container": "#00424e", "tertiary-fixed": "#6ffbbe", "secondary-container": "#03b5d3", "border-highlight": "rgba(255, 255, 255, 0.16)", "tertiary": "#4edea3", "tertiary-container": "#00aa76", "pure-black": "#000000", "on-error": "#690005", "surface-tint": "#bdc2ff", "surface-dim": "#121318", "surface-container-lowest": "#0d0e13", "on-secondary-fixed": "#001f26", "secondary": "#4cd7f6", "secondary-fixed-dim": "#4cd7f6", "on-primary": "#131e8c", "on-tertiary": "#003824", "border-glass": "rgba(255, 255, 255, 0.08)", "primary-container": "#818cf8", "error": "#ffb4ab", "on-secondary": "#003640", "surface-container": "#1e1f25", "on-tertiary-container": "#003522", "background": "#121318", "surface": "#121318", "surface-container-highest": "#34343a", "on-tertiary-fixed": "#002113" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "gutter-mobile": "1rem", "margin-mobile": "1.25rem", "margin": "3rem", "space-xl": "2.5rem", "space-xs": "0.25rem", "gutter": "1.5rem", "space-lg": "1.5rem", "space-sm": "0.5rem" }, "fontFamily": { "body-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "headline-xl-mobile": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "label-caps": ["Plus Jakarta Sans"], "label-code": ["JetBrains Mono"], "headline-xl": ["Plus Jakarta Sans"], "label-badge": ["JetBrains Mono"], "body-lg": ["Plus Jakarta Sans"] }, "fontSize": { "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "display-hero": ["64px", { "lineHeight": "72px", "fontWeight": "800" }], "body-md": ["14px", { "lineHeight": "22px", "fontWeight": "400" }], "headline-xl-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "700" }], "display-hero-mobile": ["36px", { "lineHeight": "44px", "fontWeight": "800" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-caps": ["11px", { "lineHeight": "16px", "fontWeight": "700" }], "label-code": ["13px", { "lineHeight": "20px", "fontWeight": "500" }], "headline-xl": ["44px", { "lineHeight": "52px", "fontWeight": "700" }], "label-badge": ["11px", { "lineHeight": "14px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }] } } } }</script></head><body class="bg-background font-body-md text-on-surface antialiased selection:bg-neon-violet/30 selection:text-white"><header class="fixed top-0 w-full z-50 bg-surface-dim/80 backdrop-blur-2xl shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="h-20 max-w-[1160px] mx-auto px-margin-mobile md:px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><img alt="Atoll App Icon" class="h-8 w-auto object-contain" src="assets/stitch_logo.png"/><span class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">Atoll</span><span class="font-label-badge text-label-badge text-electric-cyan bg-surface-container px-2 py-0.5 rounded-full">v1.2</span></div><nav class="hidden lg:flex items-center gap-space-lg" data-active-classes="text-on-surface font-semibold bg-surface-container px-3 py-1.5 rounded-full"><a aria-current="page" class="transition-colors text-on-surface font-semibold bg-surface-container px-3 py-1.5 rounded-full" href="#features">Features</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#interactive-preview">Interactive Island</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#shortcuts">Shortcuts</a><a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" href="#faqs">FAQs</a></nav><div class="flex items-center gap-3">
+  <a class="font-body-md text-body-md font-semibold text-pure-black bg-white hover:bg-neutral-200 transition-all px-4 py-2 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.2)] flex items-center gap-2 group" href="downloads/Atoll.dmg" download="Atoll.dmg" onclick="trackEvent('download_dmg', 'conversion', 'Atoll.dmg')">
+    <svg class="w-4 h-4 fill-current transition-transform group-hover:-translate-y-0.5" viewBox="0 0 24 24">
+      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 0.92-2.87-.9.04-2 .6-2.64 1.35-.56.64-1.06 1.7-0.93 2.73 1.01.08 2.04-.46 2.65-1.21z"/>
+    </svg>
+    <span>Download Free</span>
+  </a>
+  <a href="https://github.com/SlimmyTee/Atoll" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-bright border border-white/10 hover:border-white/20 flex items-center justify-center text-on-surface hover:text-white transition-all shadow-sm" title="View Source on GitHub">
+    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+    </svg>
+  </a>
+</div></div></header><main class="w-full pt-20 bg-background"><div class="flex flex-col w-full relative overflow-hidden bg-background">
+<!-- Ambient Atmospheric Aurora Glow (Pinned to hero top) -->
+<div class="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[550px] bg-gradient-to-br from-neon-violet/25 via-electric-cyan/20 to-tertiary/15 blur-[120px] rounded-full opacity-60"></div>
+<div class="pointer-events-none absolute top-[900px] right-0 w-[500px] h-[500px] bg-neon-violet/10 blur-[130px] rounded-full opacity-40"></div>
+<!-- Hero Section -->
+<section class="relative w-full max-w-[1160px] mx-auto px-margin-mobile md:px-margin pt-12 md:pt-16 pb-16 flex flex-col items-center text-center">
+<!-- Architecture Tag Pill -->
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high/80 backdrop-blur-md border-t border-border-highlight/30 shadow-sm mb-6">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+<span class="font-label-badge text-label-badge text-on-surface-variant tracking-wide">Native Swift • macOS 14 Sonoma &amp; 15 Sequoia</span>
+</div>
+<!-- Main Title with Gradient Shimmer -->
+<h1 class="font-display-hero text-headline-xl-mobile md:text-display-hero text-on-surface font-extrabold tracking-tight max-w-4xl mx-auto">
+      Dynamic Island.<br/>
+<span class="bg-gradient-to-r from-neon-violet via-electric-cyan to-tertiary bg-clip-text text-transparent">Native on your Mac.</span>
+</h1>
+<p class="font-body-lg text-body-md md:text-body-lg text-on-surface-variant max-w-2xl mt-5 mb-10 leading-relaxed">
+      Turn your camera notch into a fluid, living command deck. Effortless Spotify &amp; Apple Music controls, 1-click meeting joins, a temporary drag &amp; drop pocket, and focus timers.
+    </p>
+<!-- Consolidated Unified Download & Installation Hub -->
+<div class="w-full max-w-2xl bg-surface-container/70 backdrop-blur-2xl rounded-2xl p-4 md:p-6 shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+<!-- Installation Mode Tabs -->
+<div class="flex items-center justify-between pb-4">
+<div class="flex items-center gap-2 p-1 bg-surface-container-lowest rounded-full">
+<button class="px-4 py-1.5 rounded-full font-label-code text-label-code transition-all flex items-center gap-1.5 bg-surface-container-high text-on-surface font-semibold shadow-sm" id="tab-terminal-btn" onclick="switchInstallTab('terminal')">
+<span class="material-symbols-outlined text-[15px] text-tertiary">terminal</span>
+<span>Terminal (1-Line)</span>
+</button>
+<button class="px-4 py-1.5 rounded-full font-label-code text-label-code transition-all flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface" id="tab-dmg-btn" onclick="switchInstallTab('dmg')">
+<span class="material-symbols-outlined text-[15px] text-electric-cyan">laptop_mac</span>
+<span>Direct DMG</span>
+</button>
+</div>
+<!-- Security / Gatekeeper Popover Trigger -->
+<div class="relative">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-lowest hover:bg-surface-container-high transition-colors font-body-sm text-body-sm text-outline hover:text-on-surface" onclick="toggleGatekeeperModal()">
+<span class="material-symbols-outlined text-[16px] text-electric-cyan">verified_user</span>
+<span class="hidden sm:inline">First Time Mac Open?</span>
+<span class="sm:hidden">Help</span>
+</button>
+<!-- Gatekeeper Helper Tooltip Card -->
+<div class="hidden absolute right-0 top-10 z-50 w-80 p-4 rounded-xl bg-surface-container-high/95 backdrop-blur-xl shadow-2xl text-left" id="gatekeeper-popover">
+<div class="flex items-start justify-between mb-2">
+<span class="font-headline-sm text-[14px] text-on-surface font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-electric-cyan">security</span> Apple Gatekeeper Notice
+              </span>
+<button class="text-outline hover:text-on-surface text-body-sm" onclick="toggleGatekeeperModal()">✕</button>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface-variant leading-normal mb-3">
+              Because Atoll is independent software, macOS might say <em>“Apple cannot verify Atoll.dmg”</em>. Open in 2 clicks:
+            </p>
+<ol class="font-body-sm text-[12px] text-on-surface space-y-1.5 list-decimal list-inside text-left">
+<li>Click <strong>Done</strong> (don't move to bin).</li>
+<li>Go to <strong>System Settings &gt; Privacy &amp; Security</strong>.</li>
+<li>Scroll down &amp; click <strong>“Open Anyway”</strong>.</li>
+</ol>
+<div class="mt-3 pt-2 text-[11px] font-label-badge text-outline flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px] text-tertiary">check_circle</span> Safe, sandbox-compliant native code
+            </div>
+</div>
+</div>
+</div>
+<!-- Tab Content: Terminal Quick Install -->
+<div class="space-y-3" id="panel-terminal">
+<div class="flex items-center justify-between px-3 py-2 bg-surface-container-lowest rounded-lg">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#FF5F56]/80"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]/80"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#27C93F]/80"></span>
+<span class="font-label-code text-[11px] text-outline ml-2">zsh — 1-Line Safe Installer</span>
+</div>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-code text-[11px] transition-all" id="copy-btn" onclick="copyInstallCmd()">
+<span class="material-symbols-outlined text-[14px]" id="copy-icon">content_copy</span>
+<span id="copy-text">Copy</span>
+</button>
+</div>
+<div class="p-3.5 bg-pure-black/90 rounded-lg text-left overflow-x-auto flex items-center">
+<code class="font-label-code text-label-code text-primary selection:bg-neon-violet/40 selection:text-white whitespace-nowrap" id="terminal-cmd">curl -sSL https://atoll-nine.vercel.app/install.sh | bash</code>
+</div>
+<div class="flex flex-wrap items-center justify-between text-left gap-2 pt-1 font-label-badge text-[11px] text-outline">
+<span class="flex items-center gap-1 text-tertiary"><span class="material-symbols-outlined text-[14px]">bolt</span> Zero Gatekeeper warnings</span>
+<span class="flex items-center gap-1 text-electric-cyan"><span class="material-symbols-outlined text-[14px]">speed</span> Auto-installs in 3s</span>
+<span class="flex items-center gap-1 text-on-surface"><span class="material-symbols-outlined text-[14px]">lock</span> 100% Native Swift</span>
+</div>
+</div>
+<!-- Tab Content: Direct DMG Download -->
+<div class="hidden py-3 space-y-4" id="panel-dmg">
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-surface-container-lowest">
+<div class="text-left flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[26px] text-primary">deployed_code</span>
+</div>
+<div>
+<div class="font-headline-sm text-[16px] text-on-surface font-semibold flex items-center gap-2">
+                Atoll.dmg <span class="font-label-badge text-[11px] px-2 py-0.5 rounded-full bg-surface-container-high text-tertiary">v1.2.0</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Universal Binary (M1/M2/M3/M4 &amp; Intel) • 704 KB</p>
+</div>
+</div>
+<a class="w-full sm:w-auto px-6 py-2.5 rounded-full bg-white text-pure-black font-semibold font-body-md text-body-md hover:bg-neutral-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.25)] flex items-center justify-center gap-2 group" href="downloads/Atoll.dmg" download="Atoll.dmg" onclick="trackEvent('download_dmg', 'conversion', 'Atoll.dmg')">
+  <svg class="w-4 h-4 fill-current transition-transform group-hover:-translate-y-0.5" viewBox="0 0 24 24">
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 0.92-2.87-.9.04-2 .6-2.64 1.35-.56.64-1.06 1.7-0.93 2.73 1.01.08 2.04-.46 2.65-1.21z"/>
+  </svg>
+  <span>Download DMG</span>
+</a>
+</div>
+<div class="text-center font-label-code text-[11px] text-outline">
+          Designated App Identifier: <span class="text-on-surface-variant">app.atoll.desktop</span> • 100% Offline &amp; Telemetry-free
+        </div>
+</div>
+</div>
+<!-- Metadata Badges Strip -->
+<div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-outline font-label-badge text-[12px]">
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-electric-cyan">memory</span> M1 / M2 / M3 / M4 &amp; Intel</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-tertiary">energy_savings_leaf</span> 0.0% Idle CPU</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-neon-violet">shield</span> 100% Offline &amp; Private</span>
+</div>
+</section>
+<!-- Interactive MacBook Pro Island Simulator -->
+<section id="interactive-preview" class="w-full max-w-[1160px] mx-auto px-margin-mobile md:px-margin py-8 flex flex-col items-center">
+<div class="flex flex-col md:flex-row items-center justify-between w-full mb-6 gap-4">
+<div class="text-left">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-electric-cyan font-bold">Interactive Hardware Preview</span>
+<h2 class="font-headline-lg text-headline-sm md:text-headline-lg text-on-surface font-bold">Experience the Notch in Real-Time</h2>
+</div>
+<!-- Mode Selector Pills -->
+<div class="inline-flex p-1 bg-surface-container rounded-full overflow-x-auto max-w-full">
+<button class="island-tab-btn px-3.5 py-1.5 rounded-full font-body-sm text-body-sm transition-all flex items-center gap-1.5 bg-surface-container-high text-on-surface font-semibold shadow-sm" id="tab-island-music" onclick="setIslandState('music')">
+<span class="material-symbols-outlined text-[15px] text-tertiary">music_note</span>
+<span>Spotify &amp; Audio</span>
+</button>
+<button class="island-tab-btn px-3.5 py-1.5 rounded-full font-body-sm text-body-sm transition-all flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface" id="tab-island-meeting" onclick="setIslandState('meeting')">
+<span class="material-symbols-outlined text-[15px] text-electric-cyan">calendar_today</span>
+<span>Smart Meeting</span>
+</button>
+<button class="island-tab-btn px-3.5 py-1.5 rounded-full font-body-sm text-body-sm transition-all flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface" id="tab-island-pocket" onclick="setIslandState('pocket')">
+<span class="material-symbols-outlined text-[15px] text-neon-violet">folder_zip</span>
+<span>File Pocket</span>
+</button>
+<button class="island-tab-btn px-3.5 py-1.5 rounded-full font-body-sm text-body-sm transition-all flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface" id="tab-island-timer" onclick="setIslandState('timer')">
+<span class="material-symbols-outlined text-[15px] text-[#FFBD2E]">timer</span>
+<span>Focus Timer</span>
+</button>
+</div>
+</div>
+<!-- MacBook Screen Mockup -->
+<div class="w-full rounded-2xl md:rounded-3xl bg-surface-container-lowest p-2 md:p-4 shadow-[0_30px_90px_rgba(0,0,0,0.85)] relative">
+<!-- Screen Bezel Screen Shell -->
+<div class="w-full h-[380px] md:h-[480px] rounded-xl md:rounded-2xl bg-cover bg-center relative overflow-hidden flex flex-col justify-between" data-alt="High resolution abstract glowing macOS desktop wallpaper with vibrant indigo, neon violet and deep cyan silk waves against deep void space, subtle cinematic lighting" style="background-image: url('assets/stitch_wallpaper.jpg')">
+<div class="absolute inset-0 bg-gradient-to-b from-pure-black/50 via-transparent to-pure-black/70"></div>
+<!-- macOS Top Menu Bar with Camera Notch -->
+<div class="relative z-20 w-full h-8 px-4 flex items-center justify-between font-body-sm text-[12px] text-white/90 backdrop-blur-md bg-pure-black/40">
+<div class="flex items-center gap-3">
+<span class="font-bold text-[14px]"></span>
+<span class="font-semibold hidden sm:inline">Finder</span>
+<span class="hidden md:inline text-white/70">File</span>
+<span class="hidden md:inline text-white/70">Edit</span>
+<span class="hidden md:inline text-white/70">View</span>
+<span class="hidden md:inline text-white/70">Go</span>
+<span class="hidden md:inline text-white/70">Window</span>
+<span class="hidden md:inline text-white/70">Help</span>
+</div>
+<!-- The Physical Notch & Floating Island Capsule -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+<!-- Simulated Hardware Notch Root Container -->
+<div class="transition-all duration-300 ease-out bg-pure-black rounded-b-2xl px-5 py-2.5 min-w-[220px] max-w-[500px] shadow-[0_0_25px_-4px_rgba(168,85,247,0.4),0_0_15px_-2px_rgba(6,182,212,0.3)] flex flex-col items-center justify-center cursor-pointer" id="island-capsule">
+<!-- State 1: Music Playback (Default) -->
+<div class="w-full flex items-center justify-between gap-4" id="island-state-music">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden shadow-inner">
+<img src="assets/album_art.jpg" alt="Dave" class="w-full h-full object-cover">
+</div>
+<div class="text-left">
+<div class="font-headline-sm text-[13px] text-white font-semibold flex items-center gap-1.5">
+                      Streatham <span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+</div>
+<div class="font-body-sm text-[11px] text-white/60">Dave • Spotify</div>
+</div>
+</div>
+<!-- Mini waveform and playback bar -->
+<div class="flex items-center gap-2">
+<span class="font-label-code text-[11px] text-white/50">1:38</span>
+<div class="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
+<div class="w-2/5 h-full bg-tertiary rounded-full"></div>
+</div>
+<button class="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[14px]">pause</span>
+</button>
+</div>
+</div>
+<!-- State 2: Calendar Meeting Alert -->
+<div class="hidden w-full flex items-center justify-between gap-4" id="island-state-meeting">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-secondary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px] text-electric-cyan">videocam</span>
+</div>
+<div class="text-left">
+<div class="font-headline-sm text-[12px] text-white font-semibold">Design Sprint • Atoll UI</div>
+<div class="font-body-sm text-[11px] text-electric-cyan">Google Meet • alex@company.com</div>
+</div>
+</div>
+<button class="px-3 py-1 bg-electric-cyan text-pure-black font-semibold text-[11px] rounded-full hover:bg-white transition-colors flex items-center gap-1">
+<span>Join Tab</span>
+<span class="material-symbols-outlined text-[13px]">arrow_forward</span>
+</button>
+</div>
+<!-- State 3: Drag & Drop File Pocket -->
+<div class="hidden w-full flex items-center justify-between gap-3" id="island-state-pocket">
+<div class="flex items-center gap-2 text-left">
+<span class="material-symbols-outlined text-[18px] text-neon-violet">file_present</span>
+<div>
+<div class="font-label-code text-[11px] text-white truncate max-w-[130px]">mockup-v2.png</div>
+<div class="font-label-code text-[10px] text-white/50">1.4 MB • Staged in RAM</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded bg-surface-container-high font-label-badge text-[10px] text-tertiary">Ready to Drop</span>
+<button class="text-white/50 hover:text-white"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+</div>
+<!-- State 4: Pomodoro Focus Timer -->
+<div class="hidden w-full flex items-center justify-between gap-4" id="island-state-timer">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#FFBD2E]">timelapse</span>
+<div class="text-left">
+<div class="font-headline-sm text-[13px] text-white font-bold tracking-tight">24:42</div>
+<div class="font-label-caps text-[10px] text-white/60 uppercase">Deep Work Session</div>
+</div>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-body-sm text-[11px]">Pause</button>
+<button class="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-body-sm text-[11px]">Reset</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Menu Bar Right Items -->
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="font-label-code text-[11px]">100%</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+<span class="hidden sm:inline font-body-sm text-[11px]">Wed Oct 14 9:41 AM</span>
+</div>
+</div>
+<!-- Simulated Bottom macOS Dock -->
+<div class="relative z-10 mx-auto mb-3 px-3 py-2 rounded-2xl bg-pure-black/60 backdrop-blur-2xl flex items-center gap-3 shadow-xl">
+<div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-electric-cyan shadow-sm"><span class="material-symbols-outlined text-[20px]">explore</span></div>
+<div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-tertiary shadow-sm"><span class="material-symbols-outlined text-[20px]">terminal</span></div>
+<div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-neon-violet shadow-sm"><span class="material-symbols-outlined text-[20px]">chat</span></div>
+<div class="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center text-[#FFBD2E] shadow-sm"><span class="material-symbols-outlined text-[20px]">calendar_month</span></div>
+<div class="w-9 h-9 rounded-xl bg-primary/20 flex items-center justify-center text-primary shadow-sm"><span class="material-symbols-outlined text-[20px]">settings</span></div>
+</div>
+<!-- Bottom Chin Label -->
+<div class="absolute bottom-1 w-full text-center">
+<span class="font-label-badge text-[10px] text-white/30 tracking-[0.2em] uppercase font-bold">MacBook Pro</span>
+</div>
+</div>
 
-      <nav class="header-nav">
-        <a href="#interactive-preview" class="nav-link" id="nav-demo">Interactive Demo</a>
-        <a href="#features" class="nav-link" id="nav-features">Features</a>
-        <a href="#shortcuts" class="nav-link" id="nav-shortcuts">Shortcuts</a>
-        <a href="#faq" class="nav-link" id="nav-faq">FAQs</a>
-      </nav>
+        <!-- Authentic MacBook Pro Magic Keyboard & Trackpad Base -->
+        <div class="macbook-base-chassis mt-2" id="macbook-base">
+          <!-- Hinge Cylinder -->
+          <div class="macbook-hinge-section">
+            <div class="hinge-vent-left"></div>
+            <div class="hinge-barrel">
+              <span class="hinge-brand-engraving">MacBook Pro</span>
+              <span class="hinge-sheen"></span>
+            </div>
+            <div class="hinge-vent-right"></div>
+          </div>
 
-      <div class="header-actions">
-        <a href="downloads/Atoll.dmg" download="Atoll.dmg" class="btn btn-primary btn-sm" id="nav-download-btn">
-          <svg class="apple-icon" viewBox="0 0 170 170" fill="currentColor">
-            <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-5.35.22-10.27-1.9-14.77-6.35-3.26-3.04-7.14-7.88-11.64-14.51-6.19-9.14-10.97-19.53-14.35-31.18-3.37-11.64-5.06-22.75-5.06-33.31 0-14.15 3.49-25.96 10.47-35.43 6.98-9.47 15.93-14.3 26.86-14.5 4.36 0 9.27 1.15 14.74 3.44 5.46 2.3 9.4 3.5 11.83 3.6 1.95 0 6.08-1.25 12.38-3.76 6.31-2.5 11.88-3.64 16.71-3.43 12.44.75 22.38 5.25 29.83 13.51-10.89 6.64-16.22 15.8-16 27.49.23 9.48 3.86 17.39 10.9 23.74 7.04 6.34 15.34 9.87 24.89 10.58-2.39 7.42-5.49 14.93-9.3 22.52zM119.22 31.84c0-7.29 2.68-14.14 8.04-20.56 5.36-6.42 11.97-10.49 19.82-12.22 1.09 7.07-1.14 14.16-6.69 21.28-5.55 7.12-12.61 11.13-21.17 12.02v-.52z"/>
-          </svg>
-          <span>Download</span>
-        </a>
-      </div>
-    </div>
-  </header>
+          <!-- Upper Deck Aluminum Surface -->
+          <div class="macbook-deck-surface">
+            <div class="macbook-keyboard-and-speakers">
+              <!-- Left Speaker Grille -->
+              <div class="macbook-speaker-grille left-speaker" aria-hidden="true"></div>
 
-  <!-- Hero Section -->
-  <main>
-    <section class="hero-section" id="hero">
-      <div class="container hero-content">
-        <div class="hero-badge-wrapper">
-          <span class="hero-badge" id="hero-badge">
-            <span class="badge-dot"></span>
-            Native Swift • macOS 14 Sonoma & 15 Sequoia
-          </span>
+              <!-- Recessed Keyboard Well -->
+              <div class="macbook-keyboard-well">
+                <!-- Row 1: Function Row -->
+                <div class="kb-row row-fn">
+                  <div class="kb-key key-esc" data-key="Escape"><span class="key-label">esc</span></div>
+                  <div class="kb-key" data-key="F1"><span class="key-icon">🔅</span><span class="key-sub">F1</span></div>
+                  <div class="kb-key" data-key="F2"><span class="key-icon">🔆</span><span class="key-sub">F2</span></div>
+                  <div class="kb-key" data-key="F3"><span class="key-icon">⊞</span><span class="key-sub">F3</span></div>
+                  <div class="kb-key" data-key="F4"><span class="key-icon">🔍</span><span class="key-sub">F4</span></div>
+                  <div class="kb-key" data-key="F5"><span class="key-icon">🎙️</span><span class="key-sub">F5</span></div>
+                  <div class="kb-key" data-key="F6"><span class="key-icon">🌙</span><span class="key-sub">F6</span></div>
+                  <div class="kb-key" data-key="F7"><span class="key-icon">◀◀</span><span class="key-sub">F7</span></div>
+                  <div class="kb-key" data-key="F8"><span class="key-icon">▶❚❚</span><span class="key-sub">F8</span></div>
+                  <div class="kb-key" data-key="F9"><span class="key-icon">▶▶</span><span class="key-sub">F9</span></div>
+                  <div class="kb-key" data-key="F10"><span class="key-icon">🔇</span><span class="key-sub">F10</span></div>
+                  <div class="kb-key" data-key="F11"><span class="key-icon">🔉</span><span class="key-sub">F11</span></div>
+                  <div class="kb-key" data-key="F12"><span class="key-icon">🔊</span><span class="key-sub">F12</span></div>
+                  <div class="kb-key key-touchid" title="Touch ID Sensor"><div class="touchid-sensor-ring"></div></div>
+                </div>
+
+                <!-- Row 2: Number Row -->
+                <div class="kb-row row-num">
+                  <div class="kb-key" data-key="`"><span class="key-top">~</span><span class="key-bot">`</span></div>
+                  <div class="kb-key" data-key="1"><span class="key-top">!</span><span class="key-bot">1</span></div>
+                  <div class="kb-key" data-key="2"><span class="key-top">@</span><span class="key-bot">2</span></div>
+                  <div class="kb-key" data-key="3"><span class="key-top">#</span><span class="key-bot">3</span></div>
+                  <div class="kb-key" data-key="4"><span class="key-top">$</span><span class="key-bot">4</span></div>
+                  <div class="kb-key" data-key="5"><span class="key-top">%</span><span class="key-bot">5</span></div>
+                  <div class="kb-key" data-key="6"><span class="key-top">^</span><span class="key-bot">6</span></div>
+                  <div class="kb-key" data-key="7"><span class="key-top">&amp;</span><span class="key-bot">7</span></div>
+                  <div class="kb-key" data-key="8"><span class="key-top">*</span><span class="key-bot">8</span></div>
+                  <div class="kb-key" data-key="9"><span class="key-top">(</span><span class="key-bot">9</span></div>
+                  <div class="kb-key" data-key="0"><span class="key-top">)</span><span class="key-bot">0</span></div>
+                  <div class="kb-key" data-key="-"><span class="key-top">_</span><span class="key-bot">-</span></div>
+                  <div class="kb-key" data-key="="><span class="key-top">+</span><span class="key-bot">=</span></div>
+                  <div class="kb-key key-delete" data-key="Backspace"><span class="key-label">delete</span></div>
+                </div>
+
+                <!-- Row 3: QWERTY Row -->
+                <div class="kb-row row-qwerty">
+                  <div class="kb-key key-tab" data-key="Tab"><span class="key-label">tab</span></div>
+                  <div class="kb-key" data-key="q"><span class="key-main">Q</span></div>
+                  <div class="kb-key" data-key="w"><span class="key-main">W</span></div>
+                  <div class="kb-key" data-key="e"><span class="key-main">E</span></div>
+                  <div class="kb-key" data-key="r"><span class="key-main">R</span></div>
+                  <div class="kb-key" data-key="t"><span class="key-main">T</span></div>
+                  <div class="kb-key" data-key="y"><span class="key-main">Y</span></div>
+                  <div class="kb-key" data-key="u"><span class="key-main">U</span></div>
+                  <div class="kb-key" data-key="i"><span class="key-main">I</span></div>
+                  <div class="kb-key" data-key="o"><span class="key-main">O</span></div>
+                  <div class="kb-key" data-key="p"><span class="key-main">P</span></div>
+                  <div class="kb-key" data-key="["><span class="key-top">{</span><span class="key-bot">[</span></div>
+                  <div class="kb-key" data-key="]"><span class="key-top">}</span><span class="key-bot">]</span></div>
+                  <div class="kb-key key-backslash" data-key="\"><span class="key-top">|</span><span class="key-bot">\</span></div>
+                </div>
+
+                <!-- Row 4: Home Row (ASDF) -->
+                <div class="kb-row row-asdf">
+                  <div class="kb-key key-caps" data-key="CapsLock"><span class="caps-led"></span><span class="key-label">caps lock</span></div>
+                  <div class="kb-key" data-key="a"><span class="key-main">A</span></div>
+                  <div class="kb-key" data-key="s"><span class="key-main">S</span></div>
+                  <div class="kb-key" data-key="d"><span class="key-main">D</span></div>
+                  <div class="kb-key" data-key="f"><span class="key-main">F</span><span class="key-tactile-bump"></span></div>
+                  <div class="kb-key" data-key="g"><span class="key-main">G</span></div>
+                  <div class="kb-key" data-key="h"><span class="key-main">H</span></div>
+                  <div class="kb-key" data-key="j"><span class="key-main">J</span><span class="key-tactile-bump"></span></div>
+                  <div class="kb-key" data-key="k"><span class="key-main">K</span></div>
+                  <div class="kb-key" data-key="l"><span class="key-main">L</span></div>
+                  <div class="kb-key" data-key=";"><span class="key-top">:</span><span class="key-bot">;</span></div>
+                  <div class="kb-key" data-key="'"><span class="key-top">"</span><span class="key-bot">'</span></div>
+                  <div class="kb-key key-return" data-key="Enter"><span class="key-label">return</span></div>
+                </div>
+
+                <!-- Row 5: Shift Row (ZXCV) -->
+                <div class="kb-row row-shift">
+                  <div class="kb-key key-lshift" data-key="Shift"><span class="key-label">shift</span></div>
+                  <div class="kb-key" data-key="z"><span class="key-main">Z</span></div>
+                  <div class="kb-key" data-key="x"><span class="key-main">X</span></div>
+                  <div class="kb-key" data-key="c"><span class="key-main">C</span></div>
+                  <div class="kb-key" data-key="v"><span class="key-main">V</span></div>
+                  <div class="kb-key" data-key="b"><span class="key-main">B</span></div>
+                  <div class="kb-key" data-key="n"><span class="key-main">N</span></div>
+                  <div class="kb-key" data-key="m"><span class="key-main">M</span></div>
+                  <div class="kb-key" data-key=","><span class="key-top">&lt;</span><span class="key-bot">,</span></div>
+                  <div class="kb-key" data-key="."><span class="key-top">&gt;</span><span class="key-bot">.</span></div>
+                  <div class="kb-key" data-key="/"><span class="key-top">?</span><span class="key-bot">/</span></div>
+                  <div class="kb-key key-rshift" data-key="Shift"><span class="key-label">shift</span></div>
+                </div>
+
+                <!-- Row 6: Modifier Row -->
+                <div class="kb-row row-mod">
+                  <div class="kb-key key-fn" data-key="Fn"><span class="key-top">🌐</span><span class="key-bot">fn</span></div>
+                  <div class="kb-key key-ctrl" data-key="Control"><span class="key-top">⌃</span><span class="key-bot">control</span></div>
+                  <div class="kb-key key-lopt" data-key="Alt"><span class="key-top">⌥</span><span class="key-bot">option</span></div>
+                  <div class="kb-key key-lcmd" data-key="Meta"><span class="key-top">⌘</span><span class="key-bot">command</span></div>
+                  <div class="kb-key key-space" data-key=" "></div>
+                  <div class="kb-key key-rcmd" data-key="Meta"><span class="key-top">⌘</span><span class="key-bot">command</span></div>
+                  <div class="kb-key key-ropt" data-key="Alt"><span class="key-top">⌥</span><span class="key-bot">option</span></div>
+                  <div class="kb-arrow-cluster">
+                    <div class="kb-key key-arrow" data-key="ArrowLeft">◀</div>
+                    <div class="kb-arrow-updown">
+                      <div class="kb-key key-arrow key-arrow-up" data-key="ArrowUp">▲</div>
+                      <div class="kb-key key-arrow key-arrow-down" data-key="ArrowDown">▼</div>
+                    </div>
+                    <div class="kb-key key-arrow" data-key="ArrowRight">▶</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Speaker Grille -->
+              <div class="macbook-speaker-grille right-speaker" aria-hidden="true"></div>
+            </div>
+
+            <!-- Lower Deck: Palm Rests & Force Touch Trackpad -->
+            <div class="macbook-lower-deck">
+              <div class="palmrest-area left-palmrest"></div>
+              <div class="macbook-trackpad" id="macbook-trackpad" title="MacBook Pro Force Touch Trackpad">
+                <div class="trackpad-glass-surface"></div>
+              </div>
+              <div class="palmrest-area right-palmrest"></div>
+            </div>
+
+            <!-- Front Lip with Thumb Opening Groove -->
+            <div class="macbook-base-front-lip">
+              <div class="macbook-base-thumb-groove"></div>
+            </div>
+          </div>
+
+          <!-- Bottom Contact Shadow -->
+          <div class="macbook-base-shadow"></div>
         </div>
 
-        <h1 class="hero-title" id="hero-title">
-          Dynamic Island.<br>
-          <span class="gradient-text">Native on your Mac.</span>
-        </h1>
-
-        <p class="hero-subtitle" id="hero-subtitle">
-          Turn your camera notch into a fluid, living command deck. Effortless Spotify & Apple Music controls, 1-click meeting joins, a temporary drag & drop file pocket, and focus timers.
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-4 text-center">
+<strong class="text-tertiary">Pro-Tip:</strong> Seamlessly detects active Chrome, Arc &amp; Safari media, alongside Google Calendar Google Meet URLs with automated workspace profile switching.
+    </p>
+</section>
+<!-- 3x2 Unified Bento Feature Matrix -->
+<section id="features" class="w-full max-w-[1160px] mx-auto px-margin-mobile md:px-margin py-20">
+<div class="text-center max-w-2xl mx-auto mb-14">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-neon-violet font-bold">Engineered For Performance</span>
+<h2 class="font-headline-xl text-headline-lg md:text-headline-xl text-on-surface font-extrabold tracking-tight mt-2">
+        Everything you need.<br/>
+<span class="bg-gradient-to-r from-electric-cyan to-tertiary bg-clip-text text-transparent">Zero distractions.</span>
+</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3">
+        Crafted from the ground up in Swift and AppKit. Atoll anchors into your notch without stealing focus, draining battery, or phoning home.
+      </p>
+</div>
+<!-- The 6 Bento Grid Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Bento 1: Media Control -->
+<div class="bg-surface-container-low/90 backdrop-blur-xl p-6 rounded-2xl flex flex-col justify-between shadow-lg hover:shadow-neon-violet/10 hover:bg-surface-container transition-all">
+<div>
+<div class="w-12 h-12 rounded-xl bg-tertiary/10 text-tertiary flex items-center justify-center mb-5">
+<span class="material-symbols-outlined text-[28px]">graphic_eq</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-2">Spotify, Apple Music &amp; YouTube</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Native Spotify and Apple Music playback hooks, plus non-blocking automated detection for YouTube and web audio in Chrome, Arc, and Safari.
+          </p>
+</div>
+<div class="mt-6 pt-4 flex items-center justify-between text-outline font-label-badge text-[11px]">
+<span>Desktop + Web Audio</span>
+<span class="text-tertiary font-semibold">Instant Response</span>
+</div>
+</div>
+<!-- Bento 2: Intelligent Calendar -->
+<div class="bg-surface-container-low/90 backdrop-blur-xl p-6 rounded-2xl flex flex-col justify-between shadow-lg hover:shadow-electric-cyan/10 hover:bg-surface-container transition-all">
+<div>
+<div class="w-12 h-12 rounded-xl bg-electric-cyan/10 text-electric-cyan flex items-center justify-center mb-5">
+<span class="material-symbols-outlined text-[28px]">event_upcoming</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-2">Smart Meeting Alerts &amp; Routing</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Pops down unobtrusively for upcoming calls. Parses the calendar event's domain to trigger the exact Google Chrome profile (Work vs Personal) without duplicating tabs.
+          </p>
+</div>
+<div class="mt-6 pt-4 flex items-center justify-between text-outline font-label-badge text-[11px]">
+<span>Profile Routing</span>
+<span class="text-electric-cyan font-semibold">1-Click Join</span>
+</div>
+</div>
+<!-- Bento 3: File Pocket -->
+<div class="bg-surface-container-low/90 backdrop-blur-xl p-6 rounded-2xl flex flex-col justify-between shadow-lg hover:shadow-neon-violet/10 hover:bg-surface-container transition-all">
+<div>
+<div class="w-12 h-12 rounded-xl bg-neon-violet/10 text-neon-violet flex items-center justify-center mb-5">
+<span class="material-symbols-outlined text-[28px]">cloud_upload</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-2">Drag &amp; Drop File Pocket</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Stage screenshots, PDFs, or code snippets directly into the notch. Stays pinned on top across Mission Control Spaces ready to drop into Slack or Mail.
+          </p>
+</div>
+<div class="mt-6 pt-4 flex items-center justify-between text-outline font-label-badge text-[11px]">
+<span>RAM In-Memory</span>
+<span class="text-neon-violet font-semibold">Zero Clutter</span>
+</div>
+</div>
+<!-- Bento 4: Peripheral Focus Timer -->
+<div class="bg-surface-container-low/90 backdrop-blur-xl p-6 rounded-2xl flex flex-col justify-between shadow-lg hover:bg-surface-container transition-all">
+<div>
+<div class="w-12 h-12 rounded-xl bg-[#FFBD2E]/10 text-[#FFBD2E] flex items-center justify-center mb-5">
+<span class="material-symbols-outlined text-[28px]">schedule</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-2">Peripheral Focus Timer</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Quick 5, 15, or 25-minute Pomodoro sessions. Renders a subtle monospaced countdown on the right ear of the notch without crowding your active menu bar.
+          </p>
+</div>
+<div class="mt-6 pt-4 flex items-center justify-between text-outline font-label-badge text-[11px]">
+<span>Non-blocking RunLoop</span>
+<span class="text-[#FFBD2E] font-semibold">Pomodoro Ready</span>
+</div>
+</div>
+<!-- Bento 5: Multi-Monitor Geometry Profiler -->
+<div class="bg-surface-container-low/90 backdrop-blur-xl p-6 rounded-2xl flex flex-col justify-between shadow-lg hover:bg-surface-container transition-all">
+<div>
+<div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5">
+<span class="material-symbols-outlined text-[28px]">desktop_mac</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-2">Multi-Display Geometry</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Understands external setups. Automatically anchors to the physical Retina camera notch and gracefully adapts to notchless Apple Studio Displays as a floating pill.
+          </p>
+</div>
+<div class="mt-6 pt-4 flex items-center justify-between text-outline font-label-badge text-[11px]">
+<span>Display Profile Aware</span>
+<span class="text-primary font-semibold">Auto-Aligning</span>
+</div>
+</div>
+<!-- Bento 6: Pure Swift & Zero Bloat -->
+<div class="bg-surface-container-low/90 backdrop-blur-xl p-6 rounded-2xl flex flex-col justify-between shadow-lg hover:bg-surface-container transition-all">
+<div>
+<div class="w-12 h-12 rounded-xl bg-tertiary/10 text-tertiary flex items-center justify-center mb-5">
+<span class="material-symbols-outlined text-[28px]">bolt</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold mb-2">Pure Swift &amp; Zero Bloat</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+            Zero Electron. Compiled directly with Apple's LLVM toolchain into an ultralight 704 KB binary. Uses less memory than a blank browser tab with 0.0% idle CPU.
+          </p>
+</div>
+<div class="mt-6 pt-4 flex items-center justify-between text-outline font-label-badge text-[11px]">
+<span>704 KB Binary</span>
+<span class="text-tertiary font-semibold">&lt; 25MB RAM</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Keyboard Shortcuts Command Matrix -->
+<section id="shortcuts" class="w-full max-w-[1160px] mx-auto px-margin-mobile md:px-margin py-12">
+<div class="bg-surface-container/60 backdrop-blur-2xl rounded-3xl p-8 md:p-12 shadow-xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+<div>
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-bold">Instant Muscle Memory</span>
+<h2 class="font-headline-lg text-headline-md md:text-headline-lg text-on-surface font-bold mt-1">Control everything from your fingertips.</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Tactile global hotkeys pre-configured right out of the box.</p>
+</div>
+<div class="font-label-badge text-label-badge text-outline bg-surface-container-lowest px-3 py-1.5 rounded-full">
+          Customizable via macOS Settings
+        </div>
+</div>
+<!-- Shortcuts 3x2 Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- Shortcut 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="text-left">
+<div class="font-headline-sm text-[15px] text-on-surface font-semibold">Toggle Island</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Expand or collapse anywhere</div>
+</div>
+<div class="flex items-center gap-1 font-label-code text-[13px]">
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌃</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌥</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">I</kbd>
+</div>
+</div>
+<!-- Shortcut 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="text-left">
+<div class="font-headline-sm text-[15px] text-on-surface font-semibold">Pin Expanded</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Keep open for notes or call</div>
+</div>
+<div class="flex items-center gap-1 font-label-code text-[13px]">
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌃</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌥</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">P</kbd>
+</div>
+</div>
+<!-- Shortcut 3 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="text-left">
+<div class="font-headline-sm text-[15px] text-on-surface font-semibold">Dashboard View</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Music &amp; Upcoming meetings</div>
+</div>
+<div class="flex items-center gap-1 font-label-code text-[13px]">
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌃</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌥</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">1</kbd>
+</div>
+</div>
+<!-- Shortcut 4 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="text-left">
+<div class="font-headline-sm text-[15px] text-on-surface font-semibold">File Pocket</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Instant reveal staged drops</div>
+</div>
+<div class="flex items-center gap-1 font-label-code text-[13px]">
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌃</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌥</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">2</kbd>
+</div>
+</div>
+<!-- Shortcut 5 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="text-left">
+<div class="font-headline-sm text-[15px] text-on-surface font-semibold">Focus Timer</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Trigger Pomodoro countdown</div>
+</div>
+<div class="flex items-center gap-1 font-label-code text-[13px]">
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌃</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⌥</kbd>
+<kbd class="px-2 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">3</kbd>
+</div>
+</div>
+<!-- Shortcut 6 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container transition-colors">
+<div class="text-left">
+<div class="font-headline-sm text-[15px] text-on-surface font-semibold">Instant Collapse</div>
+<div class="font-body-sm text-[12px] text-on-surface-variant">Dismiss to compact notch</div>
+</div>
+<div class="flex items-center gap-1 font-label-code text-[13px]">
+<kbd class="px-3 py-1 rounded bg-surface-container-high text-on-surface shadow-inner font-mono font-bold">⎋ Esc</kbd>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Clean Accordion FAQs -->
+<section id="faqs" class="w-full max-w-[860px] mx-auto px-margin-mobile md:px-margin py-16">
+<div class="text-center mb-12">
+<span class="font-label-caps text-label-caps uppercase tracking-wider text-electric-cyan font-bold">Got Questions?</span>
+<h2 class="font-headline-lg text-headline-sm md:text-headline-lg text-on-surface font-bold mt-1">Frequently Asked Questions</h2>
+</div>
+<div class="space-y-3">
+<!-- FAQ 1 -->
+<div class="bg-surface-container-low/90 rounded-2xl overflow-hidden transition-all">
+<button class="w-full p-5 text-left flex items-center justify-between font-headline-sm text-[16px] text-on-surface hover:text-white transition-colors" onclick="toggleFaq('faq-1')">
+<span>Why does macOS say “Apple could not verify Atoll” when opening?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-200" id="faq-1-icon">expand_more</span>
+</button>
+<div class="hidden px-5 pb-5 pt-0 font-body-sm text-body-sm text-on-surface-variant leading-relaxed" id="faq-1">
+          Atoll is free, open-source software built independently without Apple's $99/year developer fee. To open it safely: click <strong>Done</strong> on the warning, open <strong>System Settings &gt; Privacy &amp; Security</strong>, scroll down to the Security section and click <strong>“Open Anyway”</strong>.
+        </div>
+</div>
+<!-- FAQ 2 -->
+<div class="bg-surface-container-low/90 rounded-2xl overflow-hidden transition-all">
+<button class="w-full p-5 text-left flex items-center justify-between font-headline-sm text-[16px] text-on-surface hover:text-white transition-colors" onclick="toggleFaq('faq-2')">
+<span>What versions of macOS does Atoll support?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-200" id="faq-2-icon">expand_more</span>
+</button>
+<div class="hidden px-5 pb-5 pt-0 font-body-sm text-body-sm text-on-surface-variant leading-relaxed" id="faq-2">
+          Atoll requires macOS 14.0 Sonoma or macOS 15.0 Sequoia (and newer). It is compiled as a Universal binary for Apple Silicon (M1, M2, M3, M4) and legacy Intel Macs.
+        </div>
+</div>
+<!-- FAQ 3 -->
+<div class="bg-surface-container-low/90 rounded-2xl overflow-hidden transition-all">
+<button class="w-full p-5 text-left flex items-center justify-between font-headline-sm text-[16px] text-on-surface hover:text-white transition-colors" onclick="toggleFaq('faq-3')">
+<span>Does it work on Macs without a notch (like Mac mini or Studio)?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-200" id="faq-3-icon">expand_more</span>
+</button>
+<div class="hidden px-5 pb-5 pt-0 font-body-sm text-body-sm text-on-surface-variant leading-relaxed" id="faq-3">
+          Yes! On Mac desktop displays or MacBooks without a physical notch, Atoll smoothly renders as an elegant floating capsule centered at the top of your display, behaving identically to the physical notch experience.
+        </div>
+</div>
+<!-- FAQ 4 -->
+<div class="bg-surface-container-low/90 rounded-2xl overflow-hidden transition-all">
+<button class="w-full p-5 text-left flex items-center justify-between font-headline-sm text-[16px] text-on-surface hover:text-white transition-colors" onclick="toggleFaq('faq-4')">
+<span>Does Atoll drain my MacBook's battery?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-200" id="faq-4-icon">expand_more</span>
+</button>
+<div class="hidden px-5 pb-5 pt-0 font-body-sm text-body-sm text-on-surface-variant leading-relaxed" id="faq-4">
+          No. Atoll is built with pure Swift and AppKit. When idle, CPU consumption is 0.0%, and memory usage averages under 25 MB. We do not use Chromium or web wrapper runtimes.
+        </div>
+</div>
+<!-- FAQ 5 -->
+<div class="bg-surface-container-low/90 rounded-2xl overflow-hidden transition-all">
+<button class="w-full p-5 text-left flex items-center justify-between font-headline-sm text-[16px] text-on-surface hover:text-white transition-colors" onclick="toggleFaq('faq-5')">
+<span>Is my data tracked or sent to the cloud?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-200" id="faq-5-icon">expand_more</span>
+</button>
+<div class="hidden px-5 pb-5 pt-0 font-body-sm text-body-sm text-on-surface-variant leading-relaxed" id="faq-5">
+          Never. Atoll is 100% offline. Calendar access uses Apple's native EventKit APIs strictly on your device to display meeting links. There are no tracking analytics, telemetry pings, or account requirements.
+        </div>
+</div>
+<!-- FAQ 6 -->
+<div class="bg-surface-container-low/90 rounded-2xl overflow-hidden transition-all">
+<button class="w-full p-5 text-left flex items-center justify-between font-headline-sm text-[16px] text-on-surface hover:text-white transition-colors" onclick="toggleFaq('faq-6')">
+<span>How do I completely uninstall Atoll?</span>
+<span class="material-symbols-outlined text-outline transition-transform duration-200" id="faq-6-icon">expand_more</span>
+</button>
+<div class="hidden px-5 pb-5 pt-0 font-body-sm text-body-sm text-on-surface-variant leading-relaxed" id="faq-6">
+          You can cleanly uninstall Atoll anytime via Terminal:
+          <code class="block mt-2 p-2.5 rounded bg-pure-black font-label-code text-[12px] text-primary">curl -sSL https://atoll-nine.vercel.app/uninstall.sh | bash</code>
+          This terminates processes, removes the app bundle, and wipes all cache files cleanly.
+        </div>
+</div>
+</div>
+</section>
+<!-- Final High-Impact CTA Section -->
+<section class="w-full max-w-[1160px] mx-auto px-margin-mobile md:px-margin pt-10 pb-24">
+<div class="relative rounded-3xl bg-surface-container-low/90 backdrop-blur-2xl p-8 md:p-16 text-center overflow-hidden shadow-2xl">
+<!-- Ambient Glow Behind CTA -->
+<div class="pointer-events-none absolute -bottom-20 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-t from-neon-violet/30 via-electric-cyan/20 to-transparent blur-[90px] rounded-full"></div>
+<div class="relative z-10 max-w-2xl mx-auto flex flex-col items-center">
+<!-- Floating App Icon Representation -->
+<div class="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center shadow-lg mb-6">
+<span class="material-symbols-outlined text-[36px] text-tertiary">dashboard_customize</span>
+</div>
+<h2 class="font-headline-xl text-headline-lg md:text-headline-xl text-on-surface font-extrabold tracking-tight">
+          Ready to elevate your Mac?
+        </h2>
+<p class="font-body-lg text-body-md md:text-body-lg text-on-surface-variant mt-3 mb-8">
+          Download Atoll today and experience your notch like never before. Instant install, ultra-lightweight, and completely free.
         </p>
+<!-- CTA Buttons Group -->
+<div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+<a class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white text-pure-black font-headline-sm text-[15px] font-bold hover:bg-neutral-200 transition-all shadow-[0_0_30px_rgba(255,255,255,0.3)] flex items-center justify-center gap-2.5 group" href="downloads/Atoll.dmg" download="Atoll.dmg" onclick="trackEvent('download_dmg', 'conversion', 'Atoll.dmg')">
+  <svg class="w-5 h-5 fill-current transition-transform group-hover:-translate-y-0.5" viewBox="0 0 24 24">
+    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 0.92-2.87-.9.04-2 .6-2.64 1.35-.56.64-1.06 1.7-0.93 2.73 1.01.08 2.04-.46 2.65-1.21z"/>
+  </svg>
+  <span>Download Atoll for Mac</span>
+  <span class="font-label-badge text-[11px] px-2 py-0.5 rounded-full bg-black/10 font-normal">704 KB • Universal</span>
+</a>
+<button class="w-full sm:w-auto px-6 py-3.5 rounded-full bg-surface-container-high hover:bg-surface-bright text-on-surface font-label-code text-[13px] transition-all flex items-center justify-center gap-2" onclick="copyInstallCmd()">
+<span class="material-symbols-outlined text-[17px] text-tertiary">terminal</span>
+<span>Copy Terminal Command</span>
+</button>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-4 mt-8 font-label-badge text-[12px] text-outline">
+<span>macOS 14 Sonoma &amp; 15 Sequoia</span>
+<span>•</span>
+<span>Apple Silicon &amp; Intel</span>
+<span>•</span>
+<span>100% Offline &amp; Private</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Vanilla Interactive Micro-Scripts -->
+<script>
+  function switchInstallTab(mode) {
+    const termBtn = document.getElementById('tab-terminal-btn');
+    const dmgBtn = document.getElementById('tab-dmg-btn');
+    const termPanel = document.getElementById('panel-terminal');
+    const dmgPanel = document.getElementById('panel-dmg');
 
-                <div class="install-options-container">
-          <!-- Install Method Tab Bar -->
-          <div class="install-method-tabs">
-            <button class="install-tab-btn active" id="tab-btn-curl" data-method="curl">
-              <span class="rec-dot"></span>
-              ⚡️ Quick Install (Terminal)
-            </button>
-            <button class="install-tab-btn" id="tab-btn-direct" data-method="direct">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-              Direct DMG
-            </button>
-          </div>
+    if (mode === 'terminal') {
+      termBtn.className = 'px-4 py-1.5 rounded-full font-label-code text-label-code transition-all flex items-center gap-1.5 bg-surface-container-high text-on-surface font-semibold shadow-sm';
+      dmgBtn.className = 'px-4 py-1.5 rounded-full font-label-code text-label-code transition-all flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface';
+      termPanel.classList.remove('hidden');
+      dmgPanel.classList.add('hidden');
+    } else {
+      dmgBtn.className = 'px-4 py-1.5 rounded-full font-label-code text-label-code transition-all flex items-center gap-1.5 bg-surface-container-high text-on-surface font-semibold shadow-sm';
+      termBtn.className = 'px-4 py-1.5 rounded-full font-label-code text-label-code transition-all flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface';
+      dmgPanel.classList.remove('hidden');
+      termPanel.classList.add('hidden');
+    }
+  }
 
-          <!-- Method 1: Terminal 1-Liner (Default & Recommended) -->
-          <div class="install-method-panel active" id="panel-method-curl">
-            <div class="terminal-install-card">
-              <div class="terminal-top-bar">
-                <div class="terminal-dots">
-                  <span class="dot red"></span>
-                  <span class="dot yellow"></span>
-                  <span class="dot green"></span>
-                </div>
-                <span class="terminal-title">zsh — 1-Line Installer (Zero Warnings)</span>
-                <button class="copy-terminal-btn" id="copy-curl-cmd" title="Copy to clipboard">
-                  <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                  <span class="copy-label">Copy</span>
-                </button>
-              </div>
-              <pre class="terminal-code"><code id="curl-code-text">curl -sSL https://atoll-nine.vercel.app/install.sh | bash</code></pre>
-            </div>
-            <div class="brew-benefits-row">
-              <span class="brew-benefit-tag">⚡️ <strong>Zero warnings:</strong> Gatekeeper bypassed safely</span>
-              <span class="brew-benefit-tag">🚀 <strong>Auto-installs:</strong> Ready in /Applications in 3 seconds</span>
-              <span class="brew-benefit-tag">🔒 <strong>100% Native Swift</strong></span>
-            </div>
-            <div class="terminal-uninstall-note">
-              <span>To uninstall anytime:</span>
-              <code>curl -sSL https://atoll-nine.vercel.app/uninstall.sh | bash</code>
-            </div>
-          </div>
+  function toggleGatekeeperModal() {
+    const popover = document.getElementById('gatekeeper-popover');
+    popover.classList.toggle('hidden');
+  }
 
+  function copyInstallCmd() {
+    const cmd = "curl -sSL https://atoll-nine.vercel.app/install.sh | bash";
+    navigator.clipboard.writeText(cmd).then(() => {
+      const copyIcon = document.getElementById('copy-icon');
+      const copyText = document.getElementById('copy-text');
+      if (copyIcon && copyText) {
+        copyIcon.textContent = 'check';
+        copyText.textContent = 'Copied!';
+        setTimeout(() => {
+          copyIcon.textContent = 'content_copy';
+          copyText.textContent = 'Copy';
+        }, 2200);
+      }
+    });
+  }
 
+  function setIslandState(state) {
+    const states = ['music', 'meeting', 'pocket', 'timer'];
+    states.forEach(s => {
+      const el = document.getElementById(`island-state-${s}`);
+      const btn = document.getElementById(`tab-island-${s}`);
+      if (s === state) {
+        el.classList.remove('hidden');
+        btn.className = 'island-tab-btn px-3.5 py-1.5 rounded-full font-body-sm text-body-sm transition-all flex items-center gap-1.5 bg-surface-container-high text-on-surface font-semibold shadow-sm';
+      } else {
+        el.classList.add('hidden');
+        btn.className = 'island-tab-btn px-3.5 py-1.5 rounded-full font-body-sm text-body-sm transition-all flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface';
+      }
+    });
+  }
 
-          <!-- Method 3: Direct Download (.dmg) -->
-          <div class="install-method-panel" id="panel-method-direct">
-            <div class="direct-download-action">
-              <a href="downloads/Atoll.dmg" download="Atoll.dmg" class="btn btn-primary btn-lg" id="hero-download-btn">
-                <svg class="apple-icon" viewBox="0 0 170 170" fill="currentColor">
-                  <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-5.35.22-10.27-1.9-14.77-6.35-3.26-3.04-7.14-7.88-11.64-14.51-6.19-9.14-10.97-19.53-14.35-31.18-3.37-11.64-5.06-22.75-5.06-33.31 0-14.15 3.49-25.96 10.47-35.43 6.98-9.47 15.93-14.3 26.86-14.5 4.36 0 9.27 1.15 14.74 3.44 5.46 2.3 9.4 3.5 11.83 3.6 1.95 0 6.08-1.25 12.38-3.76 6.31-2.5 11.88-3.64 16.71-3.43 12.44.75 22.38 5.25 29.83 13.51-10.89 6.64-16.22 15.8-16 27.49.23 9.48 3.86 17.39 10.9 23.74 7.04 6.34 15.34 9.87 24.89 10.58-2.39 7.42-5.49 14.93-9.3 22.52zM119.22 31.84c0-7.29 2.68-14.14 8.04-20.56 5.36-6.42 11.97-10.49 19.82-12.22 1.09 7.07-1.14 14.16-6.69 21.28-5.55 7.12-12.61 11.13-21.17 12.02v-.52z"/>
-                </svg>
-                <div class="btn-text-block">
-                  <span class="btn-main-text">Download Atoll.dmg</span>
-                  <span class="btn-sub-text">Free • Universal Binary (2.8 MB)</span>
-                </div>
-                <svg class="arrow-right" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-              </a>
+  function toggleFaq(id) {
+    const target = document.getElementById(id);
+    const icon = document.getElementById(`${id}-icon`);
+    const isHidden = target.classList.contains('hidden');
+    
+    // Close other FAQs
+    for (let i = 1; i <= 6; i++) {
+      const other = document.getElementById(`faq-${i}`);
+      const otherIcon = document.getElementById(`faq-${i}-icon`);
+      if (other && other !== target) {
+        other.classList.add('hidden');
+        if (otherIcon) otherIcon.style.transform = 'rotate(0deg)';
+      }
+    }
 
-              <a href="#interactive-preview" class="btn btn-secondary btn-lg" id="hero-try-btn">
-                <span class="sparkle-icon">✨</span>
-                <span>Test Live Sandbox</span>
-              </a>
-            </div>
+    if (isHidden) {
+      target.classList.remove('hidden');
+      icon.style.transform = 'rotate(180deg)';
+    } else {
+      target.classList.add('hidden');
+      icon.style.transform = 'rotate(0deg)';
+    }
+  }
 
-            <!-- Gatekeeper Quick Guide Box -->
-            <div class="gatekeeper-callout-box">
-              <div class="callout-header">
-                <span class="callout-badge">⚠️ First Time Opening on Mac?</span>
-                <span class="callout-tagline">Apple Gatekeeper Notice</span>
-              </div>
-              <p class="callout-text">
-                Because Atoll is independent software, macOS might say <em>"Apple cannot verify Atoll.dmg"</em>. To open in 2 clicks:
-              </p>
-              <div class="gatekeeper-steps-mini">
-                <div class="mini-step">
-                  <span class="step-num">1</span>
-                  <span>Click <strong>Done</strong> (don't move to bin)</span>
-                </div>
-                <div class="mini-step">
-                  <span class="step-num">2</span>
-                  <span>Open <strong>System Settings > Privacy & Security</strong></span>
-                </div>
-                <div class="mini-step">
-                  <span class="step-num">3</span>
-                  <span>Click <strong>"Open Anyway"</strong> (or Right-Click DMG > Open)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+  // Interactive Physical Keyboard typing reflection
+  document.querySelectorAll('.kb-key').forEach(k => {
+    k.addEventListener('mousedown', () => k.classList.add('pressed'));
+    k.addEventListener('mouseup', () => setTimeout(() => k.classList.remove('pressed'), 120));
+    k.addEventListener('mouseleave', () => k.classList.remove('pressed'));
+  });
 
-        <div class="hero-specs-row">
-          <span class="spec-item"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> M1 / M2 / M3 / M4 & Intel</span>
-          <span class="spec-divider">•</span>
-          <span class="spec-item"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> 0.0% Idle CPU</span>
-          <span class="spec-divider">•</span>
-          <span class="spec-item"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg> 100% Offline & Private</span>
-        </div>
-      </div>
-    </section>
+  document.addEventListener('keydown', (e) => {
+    const keyMatch = document.querySelector(`.kb-key[data-key="${CSS.escape(e.key.toLowerCase())}"]`) ||
+                     document.querySelector(`.kb-key[data-key="${CSS.escape(e.key)}"]`) ||
+                     document.querySelector(`.kb-key[data-key="${CSS.escape(e.code)}"]`);
+    if (keyMatch) keyMatch.classList.add('pressed');
+  });
 
-    <!-- Interactive Island Sandbox Preview -->
-    <section class="preview-section" id="interactive-preview">
-      <div class="container">
-        <div class="preview-header">
-          <span class="interactive-hint" id="interactive-hint">
-            <svg class="cursor-pointer-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M13.64 21.97c-.24 0-.48-.09-.67-.28l-3.37-3.37-2.31 2.31c-.39.39-1.02.39-1.41 0-.39-.39-.39-1.02 0-1.41l2.31-2.31-3.37-3.37a.95.95 0 0 1-.16-1.09c.14-.35.48-.58.85-.58h9.8c.4 0 .77.25.92.62.15.38.05.81-.25 1.09l-2.45 2.25 3.1 3.1c.39.39.39 1.02 0 1.41-.27.28-.62.43-.97.43z"/>
-            </svg>
-            Psst… it’s interactive! Hover or click the notch below
-          </span>
-          <div class="preview-mode-selectors">
-            <button class="mode-pill active" id="demo-tab-dashboard" data-tab="dashboard">Dashboard</button>
-            <button class="mode-pill" id="demo-tab-shelf" data-tab="shelf">File Pocket</button>
-            <button class="mode-pill" id="demo-tab-timer" data-tab="timer">Focus Timer</button>
-            <button class="mode-pill highlight" id="demo-tab-alert" data-tab="alert">🔔 Meeting Alert</button>
-            <button class="mode-pill" id="demo-tab-update" data-tab="update">✨ Update Alert</button>
-          </div>
-        </div>
+  document.addEventListener('keyup', (e) => {
+    const keyMatch = document.querySelector(`.kb-key[data-key="${CSS.escape(e.key.toLowerCase())}"]`) ||
+                     document.querySelector(`.kb-key[data-key="${CSS.escape(e.key)}"]`) ||
+                     document.querySelector(`.kb-key[data-key="${CSS.escape(e.code)}"]`);
+    if (keyMatch) keyMatch.classList.remove('pressed');
+  });
 
-        <!-- Authentic MacBook Pro Hardware Display -->
-        <div class="macbook-hardware-container" id="macbook-screen">
-          <div class="macbook-lid">
-            <div class="macbook-screen-glass">
-              <div class="macbook-glass-glare"></div>
-              <div class="macbook-bezel">
-                <!-- Simulated macOS Menu Bar -->
-                <div class="simulated-menubar">
-                  <div class="menubar-left">
-                    <span class="apple-menu-logo"></span>
-                    <span class="menubar-item active">Finder</span>
-                    <span class="menubar-item">File</span>
-                    <span class="menubar-item">Edit</span>
-                    <span class="menubar-item">View</span>
-                    <span class="menubar-item">Go</span>
-                    <span class="menubar-item">Window</span>
-                    <span class="menubar-item">Help</span>
-                  </div>
-                  <div class="menubar-right">
-                    <span class="menubar-symbol" title="Search">
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="20" y2="20"/></svg>
-                    </span>
-                    <span class="menubar-symbol" title="Control Center">
-                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="6" rx="3"/><circle cx="8" cy="7" r="1.5" fill="currentColor"/><rect x="3" y="14" width="18" height="6" rx="3"/><circle cx="16" cy="17" r="1.5" fill="currentColor"/></svg>
-                    </span>
-                    <span class="menubar-symbol" title="Wi-Fi">
-                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98A16.88 16.88 0 0 0 12 4zm0 3.32c3.48 0 6.64 1.34 9 3.53L12 19.83 3 10.85c2.36-2.19 5.52-3.53 9-3.53z"/></svg>
-                    </span>
-                    <div class="menubar-battery" title="Battery: 100%">
-                      <span class="battery-pct">100%</span>
-                      <svg viewBox="0 0 26 13" width="22" height="11" fill="currentColor">
-                        <rect x="1" y="1" width="20" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
-                        <rect x="2.5" y="2.5" width="17" height="8" rx="1.5" fill="#34c759"/>
-                        <path d="M22.5 4.5v4c.7 0 1.2-.5 1.2-1.2v-1.6c0-.7-.5-1.2-1.2-1.2z"/>
-                      </svg>
-                    </div>
-                    <span class="menubar-time" id="simulated-clock">Wed Oct 14 9:41 AM</span>
-                  </div>
-                </div>
-
-                <!-- THE NOTCH / DYNAMIC ISLAND SIMULATOR -->
-                <div class="island-anchor">
-              <!-- Physical Camera Cutout -->
-              <div class="physical-notch-cutout" id="physical-notch">
-                <div class="camera-lens"></div>
-                <div class="green-indicator-led"></div>
-              </div>
-
-              <!-- Interactive Dynamic Island Pill -->
-              <div class="dynamic-island-pill compact" id="dynamic-island">
-                <!-- Ambient Backdrop Shadow / Glow -->
-                <div class="island-glow" id="island-glow"></div>
-
-                <!-- COMPACT ISLAND VIEW -->
-                <div class="island-compact-view" id="island-compact">
-                  <div class="compact-left-wing">
-                    <img src="https://i.scdn.co/image/ab67616d0000b273565f69a950084775df6a4e77" alt="Album Art" class="compact-art" id="compact-art">
-                  </div>
-                  <div class="compact-notch-gap"></div>
-                  <div class="compact-right-wing">
-                    <div class="compact-waveform" id="compact-waveform">
-                      <span class="bar bar-1"></span>
-                      <span class="bar bar-2"></span>
-                      <span class="bar bar-3"></span>
-                      <span class="bar bar-4"></span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- EXPANDED ISLAND VIEW -->
-                <div class="island-expanded-view" id="island-expanded">
-                  <!-- Navigation Header Bar (Flanked around the physical notch) -->
-                  <div class="island-tabs-header">
-                    <div class="tab-button-group-left">
-                      <button class="island-tab-btn active" id="tab-btn-dashboard" data-target="dashboard">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                        Dashboard
-                      </button>
-                    </div>
-                    <div class="header-notch-gap"></div>
-                    <div class="tab-button-group-right">
-                      <button class="island-tab-btn" id="tab-btn-shelf" data-target="shelf">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
-                        Pocket <span class="badge-count" id="shelf-count">2</span>
-                      </button>
-                      <button class="island-tab-btn" id="tab-btn-timer" data-target="timer">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
-                        Timer
-                      </button>
-                      <button class="pin-toggle-btn" id="pin-island-btn" title="Pin Island Expanded">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M16 9V4l1 0V2H7v2l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- TAB 1: DASHBOARD (Music & Meeting) -->
-                  <div class="island-tab-panel active" id="panel-dashboard">
-                    <!-- UPDATE AVAILABLE HEADS-UP BANNER (Interactive Live Preview) -->
-                    <div class="update-alert-banner" id="demo-update-banner" style="display: none;">
-                      <div class="update-banner-icon">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="#38bdf8"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                      </div>
-                      <div class="update-banner-info">
-                        <div class="update-banner-tags">
-                          <span class="update-pill-badge">UPDATE AVAILABLE</span>
-                          <span class="update-ver-title">Atoll v1.1.0</span>
-                        </div>
-                        <p class="update-banner-sub" id="demo-update-status">Zero-friction OTA update • 1-Click install & auto-restart</p>
-                      </div>
-                      <div class="update-banner-actions">
-                        <button class="btn-update-now" id="btn-demo-update">
-                          <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                          <span id="demo-update-btn-text">Update Now</span>
-                        </button>
-                        <button class="btn-update-dismiss" id="btn-demo-dismiss" title="Dismiss">
-                          <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                        </button>
-                      </div>
-                    </div>
-
-                    <div class="dashboard-grid">
-                      <!-- Left: Interactive Music Player -->
-                      <div class="media-card">
-                        <div class="media-art-container">
-                          <img src="https://i.scdn.co/image/ab67616d0000b273565f69a950084775df6a4e77" alt="Now Playing" class="media-artwork" id="media-artwork-img">
-                          <div class="media-ambient-glow" id="media-ambient-glow"></div>
-                        </div>
-
-                        <div class="media-details">
-                          <div class="media-title-row">
-                            <div class="media-meta">
-                              <h4 class="track-title" id="track-title">Streatham</h4>
-                              <p class="track-artist" id="track-artist">Dave</p>
-                            </div>
-                            <span class="source-badge spotify" id="source-badge">
-                              <span class="source-dot"></span> Spotify
-                            </span>
-                          </div>
-
-                          <div class="scrubber-container">
-                            <div class="scrubber-track" id="scrubber-track">
-                              <div class="scrubber-progress" id="scrubber-progress" style="width: 42%;"></div>
-                            </div>
-                            <div class="scrubber-times">
-                              <span id="time-current">1:38</span>
-                              <span id="time-total">3:50</span>
-                            </div>
-                          </div>
-
-                          <div class="media-controls-row">
-                            <button class="ctrl-btn" id="btn-prev" title="Previous Track">
-                              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-                            </button>
-                            <button class="ctrl-btn play-pause-btn" id="btn-play-pause" title="Play / Pause">
-                              <svg id="play-pause-icon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                            </button>
-                            <button class="ctrl-btn" id="btn-next" title="Next Track">
-                              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                            </button>
-                            <div class="track-selector-dropdown">
-                              <button class="song-switcher-btn" id="btn-switch-song" title="Switch Demo Track">
-                                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6-1.01 0-1.97-.25-2.8-.7l-1.46 1.46C8.97 19.54 10.43 20 12 20c4.42 0 8-3.58 8-8h3l-4-4zM6 12c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46C15.03 4.46 13.57 4 12 4c-4.42 0-8 3.58-8 8H1l4 4 4-4H6z"/></svg>
-                                Change Song
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Right: Upcoming Meeting HUD -->
-                      <div class="meeting-card">
-                        <div class="meeting-header-row">
-                          <div class="meeting-status-tag">
-                            <span class="status-pulse-dot"></span>
-                            <span class="meeting-badge live">HAPPENING NOW</span>
-                          </div>
-                          <span class="platform-badge meet">Google Meet</span>
-                        </div>
-                        <div class="meeting-body">
-                          <h4 class="meeting-title">Design Sprint • Atoll UI</h4>
-                          <div class="meeting-meta-row">
-                            <span class="meeting-time">8:30 PM – 9:15 PM</span>
-                            <span class="account-pill" title="Chrome profile">
-                              <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-                              alex@company.com
-                            </span>
-                          </div>
-                        </div>
-                        <button class="join-call-btn" id="btn-join-meeting">
-                          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-                          <span>Join in Chrome (Existing Tab)</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- TAB 2: FILE POCKET / SHELF -->
-                  <div class="island-tab-panel" id="panel-shelf">
-                    <div class="shelf-container">
-                      <div class="shelf-dropzone" id="shelf-dropzone">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="dropzone-icon"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-                        <p class="dropzone-text">Drop files here or click to stage</p>
-                        <span class="dropzone-sub">Files stay in memory until you drag them out</span>
-                      </div>
-                      <div class="staged-files-list" id="staged-files-list">
-                        <div class="staged-file-item" data-id="1">
-                          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="file-icon"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                          <div class="file-info">
-                            <span class="file-name">mockup-v2.png</span>
-                            <span class="file-size">1.4 MB</span>
-                          </div>
-                          <button class="file-remove-btn" title="Remove">✕</button>
-                        </div>
-                        <div class="staged-file-item" data-id="2">
-                          <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="file-icon"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                          <div class="file-info">
-                            <span class="file-name">ReleaseNotes.pdf</span>
-                            <span class="file-size">420 KB</span>
-                          </div>
-                          <button class="file-remove-btn" title="Remove">✕</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- TAB 3: FOCUS TIMER -->
-                  <div class="island-tab-panel" id="panel-timer">
-                    <div class="timer-container">
-                      <div class="timer-display-block">
-                        <span class="timer-digits" id="timer-display">25:00</span>
-                        <span class="timer-label" id="timer-status-label">Pomodoro Session</span>
-                      </div>
-                      <div class="timer-presets-row">
-                        <button class="timer-preset-btn" data-time="300">5 min</button>
-                        <button class="timer-preset-btn" data-time="900">15 min</button>
-                        <button class="timer-preset-btn active" data-time="1500">25 min</button>
-                        <button class="timer-preset-btn" data-time="3000">50 min</button>
-                      </div>
-                      <div class="timer-actions-row">
-                        <button class="timer-action-btn start-btn" id="btn-timer-toggle">Start Focus</button>
-                        <button class="timer-action-btn reset-btn" id="btn-timer-reset">Reset</button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Footer Quick Settings -->
-                  <div class="island-footer-bar">
-                    <div class="quick-toggles">
-                      <button class="quick-toggle-btn" id="btn-mute-toggle">
-                        <svg id="mute-icon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                        <span id="mute-text">Mute Audio</span>
-                      </button>
-                      <button class="quick-toggle-btn" id="btn-dnd-toggle">
-                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
-                        <span>Focus Mode</span>
-                      </button>
-                    </div>
-                    <span class="island-footer-tip">Press Esc or move cursor away to collapse</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Simulated Desktop Wallpaper Content -->
-            <div class="desktop-wallpaper">
-              <img src="assets/wallpaper.jpg" alt="macOS Wallpaper" class="wallpaper-img">
-              <div class="meeting-toast-feedback" id="meeting-toast">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="#34c759"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                <span>Focused existing Chrome tab • Account: <strong>alex@company.com</strong></span>
-              </div>
-              <div class="desktop-dock">
-                <!-- Finder -->
-                <div class="dock-item" title="Finder">
-                  <div class="dock-icon dock-finder">
-                    <svg viewBox="0 0 64 64" width="42" height="42">
-                      <defs>
-                        <linearGradient id="finder-bg" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stop-color="#3bb2f6"/>
-                          <stop offset="100%" stop-color="#0f64cf"/>
-                        </linearGradient>
-                        <linearGradient id="finder-face" x1="0" y1="0" x2="1" y2="1">
-                          <stop offset="0%" stop-color="#90dbff"/>
-                          <stop offset="100%" stop-color="#d8f4ff"/>
-                        </linearGradient>
-                      </defs>
-                      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#finder-bg)"/>
-                      <path d="M32 6 C17.6 6 6 17.6 6 32 C6 46.4 17.6 58 32 58 C32 58 36 42 36 32 C36 22 32 6 32 6 Z" fill="url(#finder-face)"/>
-                      <circle cx="21" cy="26" r="3.5" fill="#09417c"/>
-                      <circle cx="43" cy="26" r="3.5" fill="#09417c"/>
-                      <path d="M32 20 v17 h-7" stroke="#09417c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                      <path d="M18 40 C22 47 42 47 46 40" stroke="#09417c" stroke-width="3" stroke-linecap="round" fill="none"/>
-                    </svg>
-                  </div>
-                  <span class="dock-active-dot"></span>
-                </div>
-
-                <!-- Safari -->
-                <div class="dock-item" title="Safari">
-                  <div class="dock-icon dock-safari">
-                    <svg viewBox="0 0 64 64" width="42" height="42">
-                      <defs>
-                        <linearGradient id="safari-bg" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stop-color="#ffffff"/>
-                          <stop offset="100%" stop-color="#e2e8f0"/>
-                        </linearGradient>
-                        <linearGradient id="safari-ocean" x1="0" y1="0" x2="1" y2="1">
-                          <stop offset="0%" stop-color="#32b0f8"/>
-                          <stop offset="100%" stop-color="#0263d4"/>
-                        </linearGradient>
-                      </defs>
-                      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#safari-bg)"/>
-                      <circle cx="32" cy="32" r="25" fill="url(#safari-ocean)"/>
-                      <circle cx="32" cy="32" r="24" stroke="rgba(255,255,255,0.4)" stroke-width="1" fill="none"/>
-                      <g stroke="rgba(255,255,255,0.85)" stroke-width="1.5">
-                        <line x1="32" y1="9" x2="32" y2="13"/>
-                        <line x1="32" y1="51" x2="32" y2="55"/>
-                        <line x1="9" y1="32" x2="13" y2="32"/>
-                        <line x1="51" y1="32" x2="55" y2="32"/>
-                      </g>
-                      <g transform="rotate(45 32 32)">
-                        <polygon points="32,8 36.5,32 32,30 27.5,32" fill="#ff3b30"/>
-                        <polygon points="32,56 36.5,32 32,34 27.5,32" fill="#ffffff"/>
-                      </g>
-                      <circle cx="32" cy="32" r="2.2" fill="#ffffff"/>
-                    </svg>
-                  </div>
-                </div>
-
-                <!-- Messages -->
-                <div class="dock-item" title="Messages">
-                  <div class="dock-icon dock-messages">
-                    <svg viewBox="0 0 64 64" width="42" height="42">
-                      <defs>
-                        <linearGradient id="msg-bg" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stop-color="#5ced6f"/>
-                          <stop offset="100%" stop-color="#26c73f"/>
-                        </linearGradient>
-                      </defs>
-                      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#msg-bg)"/>
-                      <path d="M32 15 C20.9 15 12 23 12 32.8 C12 37.4 14.1 41.5 17.5 44.7 C16.9 47.3 15.5 49.3 14 50.7 C16.5 50.7 20.3 49.6 23.2 47.9 C25.9 49.4 28.9 50.2 32 50.2 C43.1 50.2 52 42.2 52 32.8 C52 23 43.1 15 32 15 Z" fill="#ffffff"/>
-                    </svg>
-                  </div>
-                </div>
-
-                <!-- Music -->
-                <div class="dock-item" title="Music">
-                  <div class="dock-icon dock-music">
-                    <svg viewBox="0 0 64 64" width="42" height="42">
-                      <defs>
-                        <linearGradient id="music-bg" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stop-color="#ff4365"/>
-                          <stop offset="100%" stop-color="#f8243e"/>
-                        </linearGradient>
-                      </defs>
-                      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#music-bg)"/>
-                      <path d="M42 16 v22.5 C40.5 37.6 38.4 37 36 37 C30.5 37 26 40.6 26 45 C26 49.4 30.5 53 36 53 C41.5 53 46 49.4 46 45 V25 l-18 4 v18.5 C26.5 46.6 24.4 46 22 46 C16.5 46 12 49.6 12 54 C12 58.4 16.5 62 22 62 C27.5 62 32 58.4 32 54 V21 Z" fill="#ffffff" transform="scale(0.85) translate(4, 2)"/>
-                    </svg>
-                  </div>
-                </div>
-
-                <!-- Calendar -->
-                <div class="dock-item" title="Calendar">
-                  <div class="dock-icon dock-calendar">
-                    <svg viewBox="0 0 64 64" width="42" height="42">
-                      <rect x="2" y="2" width="60" height="60" rx="14" fill="#ffffff"/>
-                      <path d="M2 16 C2 8.3 8.3 2 16 2 L48 2 C55.7 2 62 8.3 62 16 L62 21 L2 21 Z" fill="#ff3b30"/>
-                      <text x="32" y="16" fill="#ffffff" font-size="9" font-weight="700" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif">WED</text>
-                      <text x="32" y="49" fill="#1d1d1f" font-size="26" font-weight="400" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, sans-serif">14</text>
-                    </svg>
-                  </div>
-                </div>
-
-                <!-- Atoll (Active Running in Notch) -->
-                <div class="dock-item" title="Atoll (Running in Notch)">
-                  <div class="dock-icon dock-atoll">
-                    <img src="assets/icon.jpg" alt="Atoll" class="dock-app-icon">
-                  </div>
-                  <span class="dock-active-dot"></span>
-                </div>
-
-                <!-- System Settings -->
-                <div class="dock-item" title="System Settings">
-                  <div class="dock-icon dock-settings">
-                    <svg viewBox="0 0 64 64" width="42" height="42">
-                      <defs>
-                        <linearGradient id="gear-bg" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stop-color="#9aa0a6"/>
-                          <stop offset="100%" stop-color="#676c72"/>
-                        </linearGradient>
-                      </defs>
-                      <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#gear-bg)"/>
-                      <circle cx="32" cy="32" r="13" stroke="#ffffff" stroke-width="4.5" fill="none"/>
-                      <circle cx="32" cy="32" r="6.5" fill="#ffffff"/>
-                      <path d="M32 10 v4 M32 50 v4 M10 32 h4 M50 32 h4 M16.5 16.5 l3 3 M44.5 44.5 l3 3 M16.5 47.5 l3 -3 M44.5 19.5 l3 -3" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>
-                    </svg>
-                  </div>
-                </div>
-
-                <div class="dock-separator"></div>
-
-                <!-- Trash -->
-                <div class="dock-item" title="Trash">
-                  <div class="dock-icon dock-trash">
-                    <svg viewBox="0 0 64 64" width="42" height="42">
-                      <defs>
-                        <linearGradient id="trash-glass" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stop-color="rgba(255,255,255,0.7)"/>
-                          <stop offset="100%" stop-color="rgba(255,255,255,0.2)"/>
-                        </linearGradient>
-                      </defs>
-                      <rect x="15" y="16" width="34" height="4" rx="2" fill="rgba(255,255,255,0.85)"/>
-                      <path d="M18 20 L22 54 C22.2 56 24 57.5 26 57.5 L38 57.5 C40 57.5 41.8 56 42 54 L46 20 Z" fill="url(#trash-glass)" stroke="rgba(255,255,255,0.75)" stroke-width="2"/>
-                      <line x1="27" y1="26" x2="28" y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
-                      <line x1="37" y1="26" x2="36" y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
-                      <line x1="32" y1="26" x2="32" y2="50" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- MacBook Pro Bottom Chassis / Keyboard Deck Chin -->
-      <div class="macbook-chassis-bottom">
-        <div class="macbook-hinge-bar"></div>
-        <div class="macbook-front-lip">
-          <div class="macbook-thumb-groove"></div>
-          <span class="macbook-brand-engraving">MacBook Pro</span>
-        </div>
-      </div>
-      <div class="macbook-ambient-shadow"></div>
-    </div>
-
-        <div class="interactive-controls-footer">
-          <p class="try-tip">
-            💡 <strong>Pro-Tip:</strong> In the real macOS app, Atoll seamlessly controls Spotify, Apple Music, and active YouTube or web audio in Chrome & Safari, alongside Google Calendar meeting alerts.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Core Features Grid -->
-    <section class="features-section" id="features">
-      <div class="container">
-        <div class="section-heading text-center">
-          <span class="section-tag">Engineered for Performance</span>
-          <h2 class="section-title">Everything you need.<br><span class="gradient-text">Zero distractions.</span></h2>
-          <p class="section-desc">Atoll was crafted from the ground up in Swift and AppKit. It lives in your notch without stealing focus, hogging battery, or invading your privacy.</p>
-        </div>
-
-        <div class="features-grid">
-          <!-- Card 1 -->
-          <div class="feature-card" id="feature-card-spotify">
-            <div class="feature-icon-wrapper spotify-accent">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.627.627 0 0 1-.86.208c-2.355-1.439-5.32-1.765-8.812-.967a.627.627 0 1 1-.277-1.224c3.823-.873 7.098-.504 9.74 1.122.296.182.39.57.209.861zm1.224-2.723a.784.784 0 0 1-1.077.258c-2.695-1.657-6.804-2.136-9.992-1.168a.784.784 0 1 1-.456-1.5c3.639-1.104 8.18-.574 11.267 1.333.37.228.487.718.258 1.077zm.105-2.834c-3.232-1.92-8.567-2.097-11.644-1.163a.941.941 0 1 1-.55-1.802c3.535-1.073 9.42-.865 13.14 1.345a.94.94 0 1 1-.946 1.62z"/>
-              </svg>
-            </div>
-            <h3 class="feature-title">Spotify, Apple Music & YouTube</h3>
-            <p class="feature-desc">Control music and video playback effortlessly. Atoll seamlessly controls native Spotify and Apple Music, plus automatic playback detection for YouTube, Apple Music Web, and SoundCloud in Chrome and Safari.</p>
-            <div class="feature-subpill">Desktop Apps • Chrome • Safari • Arc</div>
-          </div>
-
-          <!-- Card 2 -->
-          <div class="feature-card" id="feature-card-meetings">
-            <div class="feature-icon-wrapper calendar-accent">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
-              </svg>
-            </div>
-            <h3 class="feature-title">Smart Meeting Alerts & Chrome Multi-Account Routing</h3>
-            <p class="feature-desc">When it’s time for your call, Atoll pops down from the notch for a few seconds with a 1-click Join button. It reads the calendar event’s email to open the exact Google Chrome profile (Work vs Personal), or focuses an already-open meeting tab without creating duplicate tabs.</p>
-            <div class="feature-subpill">Automatic Notch Popdown • Chrome Tab Deduplication</div>
-          </div>
-
-          <!-- Card 3 -->
-          <div class="feature-card" id="feature-card-shelf">
-            <div class="feature-icon-wrapper shelf-accent">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
-              </svg>
-            </div>
-            <h3 class="feature-title">Drag & Drop File Pocket</h3>
-            <p class="feature-desc">Grab a screenshot or file and drop it into the notch. It hovers conveniently on top while you change Spaces or switch full-screen apps, ready to be dropped into Slack or Mail.</p>
-            <div class="feature-subpill">Spring Dropzone with Glow Detection</div>
-          </div>
-
-          <!-- Card 4 -->
-          <div class="feature-card" id="feature-card-timer">
-            <div class="feature-icon-wrapper timer-accent">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42C16.07 4.74 14.12 4 12 4c-4.97 0-9 4.03-9 9s4.02 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
-              </svg>
-            </div>
-            <h3 class="feature-title">Peripheral Focus Timer</h3>
-            <p class="feature-desc">Set 5, 15, or 25-minute Pomodoro timers. Shows a monospaced countdown on the right ear of the notch without cluttering your menu bar or active work area.</p>
-            <div class="feature-subpill">Non-blocking Common Mode RunLoop</div>
-          </div>
-
-          <!-- Card 5 -->
-          <div class="feature-card" id="feature-card-display">
-            <div class="feature-icon-wrapper display-accent">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20 3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h3l-1 1v2h12v-2l-1-1h3c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 13H4V5h16v11z"/>
-              </svg>
-            </div>
-            <h3 class="feature-title">Smart Display Multi-Monitor</h3>
-            <p class="feature-desc">Understands external screens. Automatically anchors to the built-in Retina display with the camera notch, and stays politely tucked away from secondary studio monitors.</p>
-            <div class="feature-subpill">Automatic Notch Geometry Profiler</div>
-          </div>
-
-          <!-- Card 6 -->
-          <div class="feature-card" id="feature-card-native">
-            <div class="feature-icon-wrapper native-accent">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
-              </svg>
-            </div>
-            <h3 class="feature-title">Pure Swift & Zero Bloat</h3>
-            <p class="feature-desc">Not an Electron wrapper. Compiled with Apple’s native Swift toolchain into a tiny 704 KB bundle. Consumes less memory than a single browser tab, with zero idle battery impact.</p>
-            <div class="feature-subpill">704 KB Binary • No Rosetta Required</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Keyboard Shortcuts Showcase -->
-    <section class="shortcuts-section" id="shortcuts">
-      <div class="container">
-        <div class="section-heading text-center">
-          <span class="section-tag">Instant Muscle Memory</span>
-          <h2 class="section-title">Control everything<br><span class="gradient-text">from your fingertips.</span></h2>
-          <p class="section-desc">Global hotkeys configured right out of the box.</p>
-        </div>
-
-        <div class="shortcuts-grid">
-          <div class="shortcut-card">
-            <div class="key-combo">
-              <kbd class="key">⌃</kbd>
-              <kbd class="key">⌥</kbd>
-              <kbd class="key">I</kbd>
-            </div>
-            <div class="shortcut-info">
-              <h4>Toggle Island</h4>
-              <p>Expand or collapse the Dynamic Island from anywhere</p>
-            </div>
-          </div>
-
-          <div class="shortcut-card">
-            <div class="key-combo">
-              <kbd class="key">⌃</kbd>
-              <kbd class="key">⌥</kbd>
-              <kbd class="key">P</kbd>
-            </div>
-            <div class="shortcut-info">
-              <h4>Pin Expanded</h4>
-              <p>Keep the island open while taking meeting notes or monitoring timer</p>
-            </div>
-          </div>
-
-          <div class="shortcut-card">
-            <div class="key-combo">
-              <kbd class="key">⌃</kbd>
-              <kbd class="key">⌥</kbd>
-              <kbd class="key">1</kbd>
-            </div>
-            <div class="shortcut-info">
-              <h4>Dashboard View</h4>
-              <p>Jump straight to Music controls and Upcoming Calendar meetings</p>
-            </div>
-          </div>
-
-          <div class="shortcut-card">
-            <div class="key-combo">
-              <kbd class="key">⌃</kbd>
-              <kbd class="key">⌥</kbd>
-              <kbd class="key">2</kbd>
-            </div>
-            <div class="shortcut-info">
-              <h4>File Pocket</h4>
-              <p>Instantly reveal your staged files ready to drag out</p>
-            </div>
-          </div>
-
-          <div class="shortcut-card">
-            <div class="key-combo">
-              <kbd class="key">⌃</kbd>
-              <kbd class="key">⌥</kbd>
-              <kbd class="key">3</kbd>
-            </div>
-            <div class="shortcut-info">
-              <h4>Focus Timer</h4>
-              <p>Start, pause, or reset your focus session with one keystroke</p>
-            </div>
-          </div>
-
-          <div class="shortcut-card">
-            <div class="key-combo">
-              <kbd class="key">⎋</kbd>
-            </div>
-            <div class="shortcut-info">
-              <h4>Instant Collapse</h4>
-              <p>Dismiss the island instantly back to its compact notch state</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FAQs Section -->
-    <section class="faq-section" id="faq">
-      <div class="container faq-container">
-        <div class="section-heading text-center">
-          <span class="section-tag">Got Questions?</span>
-          <h2 class="section-title">Frequently Asked Questions</h2>
-        </div>
-
-        <div class="faq-accordion" id="faq-accordion">
-          <div class="faq-item" id="faq-gatekeeper">
-            <button class="faq-question" id="faq-btn-gatekeeper">
-              <span>Why does macOS say "Apple could not verify Atoll" when opening?</span>
-              <span class="faq-chevron">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-              </span>
-            </button>
-            <div class="faq-answer">
-              <p>Atoll is free, open-source software built independently without Apple's /year developer fee. Because of this, macOS Gatekeeper shows a standard security alert for downloaded files.</p>
-              <p>To open it in 5 seconds:</p>
-              <ol style="margin-left: 20px; line-height: 1.8;">
-                <li>Click <strong>Done</strong> on the warning dialog (do not move to bin).</li>
-                <li>Open <strong>System Settings > Privacy & Security</strong>.</li>
-                <li>Scroll down to the <strong>Security</strong> section and click <strong>"Open Anyway"</strong> next to Atoll.</li>
-                <li>Alternatively, right-click (or Control-click) <code>Atoll.dmg</code> in Finder and select <strong>Open</strong>.</li>
-              </ol>
-            </div>
-          </div>
-
-          <div class="faq-item" id="faq-1">
-            <button class="faq-question" id="faq-btn-1">
-              <span>What versions of macOS does Atoll support?</span>
-              <span class="faq-chevron">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-              </span>
-            </button>
-            <div class="faq-answer">
-              <p>Atoll requires macOS 14.0 Sonoma or macOS 15.0 Sequoia (and newer). It is fully compiled as a Universal binary for Apple Silicon (M1, M2, M3, M4) and Intel Macs.</p>
-            </div>
-          </div>
-
-          <div class="faq-item" id="faq-2">
-            <button class="faq-question" id="faq-btn-2">
-              <span>Does it work on Macs without a notch (like Mac mini or Studio)?</span>
-              <span class="faq-chevron">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-              </span>
-            </button>
-            <div class="faq-answer">
-              <p>Yes! On Mac desktop displays or MacBooks without a physical notch, Atoll smoothly renders as an elegant floating capsule centered at the top of your display, behaving identically to the physical notch experience.</p>
-            </div>
-          </div>
-
-          <div class="faq-item" id="faq-3">
-            <button class="faq-question" id="faq-btn-3">
-              <span>Does Atoll drain my MacBook’s battery?</span>
-              <span class="faq-chevron">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-              </span>
-            </button>
-            <div class="faq-answer">
-              <p>No. Atoll is built with pure Swift and AppKit. When idle, CPU consumption is 0.0%, and memory usage averages under 25 MB. We don't use heavy web technologies or Electron.</p>
-            </div>
-          </div>
-
-          <div class="faq-item" id="faq-4">
-            <button class="faq-question" id="faq-btn-4">
-              <span>How does Spotify Connect detection work?</span>
-              <span class="faq-chevron">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-              </span>
-            </button>
-            <div class="faq-answer">
-              <p>Even when you start playing music on your iPhone or iPad via Spotify Connect, Atoll's dedicated background queue polls Spotify desktop state every 750ms using non-blocking AppleScript queries with zero UI hitching.</p>
-            </div>
-          </div>
-
-          <div class="faq-item" id="faq-5">
-            <button class="faq-question" id="faq-btn-5">
-              <span>Is my data tracked or sent to the cloud?</span>
-              <span class="faq-chevron">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-              </span>
-            </button>
-            <div class="faq-answer">
-              <p>Never. Atoll is 100% offline. Calendar access uses Apple’s native EventKit APIs strictly on your device to display meeting links. No analytics, no telemetry, and no account required.</p>
-            </div>
-          </div>
-
-          <div class="faq-item" id="faq-uninstall">
-            <button class="faq-question" id="faq-btn-uninstall">
-              <span>How do I completely uninstall Atoll?</span>
-              <span class="faq-chevron">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-              </span>
-            </button>
-            <div class="faq-answer">
-              <p>You can cleanly uninstall Atoll anytime with a single command in Terminal:</p>
-              <pre class="faq-code-block"><code>curl -sSL https://atoll-nine.vercel.app/uninstall.sh | bash</code></pre>
-              <p>This terminates running processes, deletes <code>/Applications/Atoll.app</code>, and removes all cache and preference files without leaving any residual data behind.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Final Call to Action -->
-    <section class="final-cta-section" id="download">
-      <div class="container">
-        <div class="final-cta-card">
-          <div class="cta-art">
-            <img src="assets/icon.jpg" alt="Atoll App Icon" class="cta-app-icon">
-          </div>
-          <h2 class="cta-title">Ready to elevate your Mac?</h2>
-          <p class="cta-desc">Download Atoll today and experience your notch like never before. Instant install, lightweight, and completely free.</p>
-          
-          <div class="cta-button-group">
-            <a href="downloads/Atoll.dmg" download="Atoll.dmg" class="btn btn-primary btn-xl" id="final-download-btn">
-              <svg class="apple-icon" viewBox="0 0 170 170" fill="currentColor">
-                <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-5.35.22-10.27-1.9-14.77-6.35-3.26-3.04-7.14-7.88-11.64-14.51-6.19-9.14-10.97-19.53-14.35-31.18-3.37-11.64-5.06-22.75-5.06-33.31 0-14.15 3.49-25.96 10.47-35.43 6.98-9.47 15.93-14.3 26.86-14.5 4.36 0 9.27 1.15 14.74 3.44 5.46 2.3 9.4 3.5 11.83 3.6 1.95 0 6.08-1.25 12.38-3.76 6.31-2.5 11.88-3.64 16.71-3.43 12.44.75 22.38 5.25 29.83 13.51-10.89 6.64-16.22 15.8-16 27.49.23 9.48 3.86 17.39 10.9 23.74 7.04 6.34 15.34 9.87 24.89 10.58-2.39 7.42-5.49 14.93-9.3 22.52zM119.22 31.84c0-7.29 2.68-14.14 8.04-20.56 5.36-6.42 11.97-10.49 19.82-12.22 1.09 7.07-1.14 14.16-6.69 21.28-5.55 7.12-12.61 11.13-21.17 12.02v-.52z"/>
-              </svg>
-              <span>Download Atoll for Mac</span>
-              <span class="file-size-tag">704 KB • DMG</span>
-            </a>
-          </div>
-
-          <p class="cta-checksum">
-            Universal DMG Build • Code signed with designated identifier <code class="code-pill">app.atoll.desktop</code>
-          </p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="container footer-content">
-      <div class="footer-left">
-        <div class="footer-brand">
-          <img src="assets/icon.jpg" alt="Atoll" class="footer-icon">
-          <span>Atoll</span>
-        </div>
-        <p class="footer-copy">Crafted with passion for macOS power users. Designed by Daniel Umoren.</p>
-      </div>
-
-      <div class="footer-links">
-        <a href="#hero">Back to Top</a>
-        <a href="downloads/Atoll.dmg" download="Atoll.dmg">Direct Download</a>
-        <a href="#features">Features</a>
-        <a href="#faq">FAQ</a>
-      </div>
-    </div>
-  </footer>
-
-  <script src="app.js"></script>
-</body>
-</html>
+</script></main><footer class="w-full bg-surface-container-lowest py-space-xl"><div class="max-w-[1160px] mx-auto px-margin-mobile md:px-margin flex flex-col md:flex-row items-center justify-between gap-space-lg"><div class="flex flex-col items-center md:items-start gap-space-xs"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface font-bold">Atoll</span><span class="font-label-badge text-label-badge text-outline">for macOS</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 Atoll. Designed &amp; Crafted with precision by Daniel Umoren.</p></div><div class="flex flex-wrap items-center justify-center gap-space-lg"><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="downloads/Atoll.dmg" download="Atoll.dmg" onclick="trackEvent('download_dmg', 'conversion', 'Atoll.dmg')">Releases</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#shortcuts">Keyboard Specs</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="https://github.com/SlimmyTee/Atoll" target="_blank" rel="noopener noreferrer">Privacy Manifesto</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#faqs">Support</a></div></div></footer></body></html>

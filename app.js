@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
       title: 'Streatham',
       artist: 'Dave',
       album: 'PSYCHODRAMA',
-      artwork: 'https://i.scdn.co/image/ab67616d0000b273565f69a950084775df6a4e77',
+      artwork: 'assets/album_art.jpg',
       duration: 205,
       source: 'Spotify',
       badgeClass: 'spotify',
@@ -597,3 +597,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+  // 9. Interactive Laptop Keyboard Support
+  const allKeys = document.querySelectorAll('.kb-key');
+  allKeys.forEach(k => {
+    k.addEventListener('mousedown', () => {
+      k.classList.add('pressed');
+    });
+    k.addEventListener('mouseup', () => {
+      setTimeout(() => k.classList.remove('pressed'), 120);
+    });
+    k.addEventListener('mouseleave', () => {
+      k.classList.remove('pressed');
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const keyMatch = document.querySelector(`.kb-key[data-key="${CSS.escape(e.key.toLowerCase())}"]`) ||
+                     document.querySelector(`.kb-key[data-key="${CSS.escape(e.key)}"]`) ||
+                     document.querySelector(`.kb-key[data-key="${CSS.escape(e.code)}"]`);
+    if (keyMatch) {
+      keyMatch.classList.add('pressed');
+    }
+  });
+
+  document.addEventListener('keyup', (e) => {
+    const keyMatch = document.querySelector(`.kb-key[data-key="${CSS.escape(e.key.toLowerCase())}"]`) ||
+                     document.querySelector(`.kb-key[data-key="${CSS.escape(e.key)}"]`) ||
+                     document.querySelector(`.kb-key[data-key="${CSS.escape(e.code)}"]`);
+    if (keyMatch) {
+      keyMatch.classList.remove('pressed');
+    }
+  });
