@@ -189,32 +189,48 @@ public class IslandViewModel: ObservableObject {
         dismissMeetingAlert()
     }
 
+    // Hover Intent Deliberation:
+    // Requires deliberate cursor dwelling (~0.35s) before expanding,
+    // so casual mouse flicks, swiping gestures, or scrolling past the notch never trigger it!
+    private var hoverExpandWorkItem: DispatchWorkItem?
+
     public func onMouseEnter() {
         isHovered = true
         meetingAlertDismissTimer?.cancel()
         collapseWorkItem?.cancel()
         collapseWorkItem = nil
-        checkMuteState()
-        menuSpaceMonitor.evaluateCurrentApp()
         
-        // Dwell Intent: If the cursor remains hovered for 1.8 seconds, automatically expand fully!
-        dwellTimer?.cancel()
-        let timerItem = DispatchWorkItem { [weak self] in
-            guard let self = self, self.isExpanded else { return }
+        // If already expanded (e.g. pinned or opened via click/dwell), keep it active
+        if isExpanded {
+            checkMuteState()
+            menuSpaceMonitor.evaluateCurrentApp()
+            return
+        }
+        
+        // Intentional Hover Delay:
+        // Moving through the notch during trackpad gestures, scrolling, or accessing top window buttons
+        // will exit before this threshold and cancel expansion completely.
+        hoverExpandWorkItem?.cancel()
+        let expandItem = DispatchWorkItem { [weak self] in
+            guard let self = self, self.isHovered, !self.isExpanded else { return }
+            self.checkMuteState()
+            self.menuSpaceMonitor.evaluateCurrentApp()
+            
+            // Dwell Intent: If cursor remains hovered for an additional 1.8 seconds, blossom into full dashboard
+            self.startDwellTimer()
+            
             withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-                self.isDwellExpanded = true
+                self.isExpanded = true
             }
         }
-        dwellTimer = timerItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8, execute: timerItem)
-        
-        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-            self.isExpanded = true
-        }
+        self.hoverExpandWorkItem = expandItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: expandItem)
     }
     
     public func onMouseLeave() {
         isHovered = false
+        hoverExpandWorkItem?.cancel()
+        hoverExpandWorkItem = nil
         dwellTimer?.cancel()
         dwellTimer = nil
         
@@ -223,18 +239,46 @@ public class IslandViewModel: ObservableObject {
         collapseWorkItem?.cancel()
         let workItem = DispatchWorkItem { [weak self] in
             guard let self = self, !self.isPinned else { return }
-            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
                 self.isExpanded = false
                 self.isDwellExpanded = false
             }
         }
         collapseWorkItem = workItem
-        // Tight 0.06s debounce: collapses immediately when cursor exits
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06, execute: workItem)
+        // 0.12s debounce to avoid micro-flicker
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: workItem)
+    }
+    
+    private func startDwellTimer() {
+        dwellTimer?.cancel()
+        let timerItem = DispatchWorkItem { [weak self] in
+            guard let self = self, self.isExpanded, self.isHovered else { return }
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                self.isDwellExpanded = true
+            }
+        }
+        dwellTimer = timerItem
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8, execute: timerItem)
+    }
+    
+    public func onDragTargetChanged(isTargeted: Bool) {
+        if isTargeted {
+            hoverExpandWorkItem?.cancel()
+            hoverExpandWorkItem = nil
+            collapseWorkItem?.cancel()
+            collapseWorkItem = nil
+            activeTab = .shelf
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                self.isExpanded = true
+            }
+        }
     }
     
     public func toggleExpand() {
+        hoverExpandWorkItem?.cancel()
+        hoverExpandWorkItem = nil
         collapseWorkItem?.cancel()
+        collapseWorkItem = nil
         withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
             self.isExpanded.toggle()
         }

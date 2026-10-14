@@ -73,8 +73,21 @@ public class IslandWindowController: NSObject {
         hostingView.isPointInside = { [weak self] point in
             guard let self = self else { return false }
             let isExp = self.viewModel.isExpanded
-            let currentW: CGFloat = isExp ? (self.viewModel.currentExpandedWidth + 12) : (ScreenMetrics.notchWidth + 90)
-            let currentH: CGFloat = isExp ? (self.viewModel.currentExpandedHeight + 16) : (ScreenMetrics.notchHeight + 10)
+            let currentW: CGFloat
+            let currentH: CGFloat
+            
+            if isExp {
+                currentW = self.viewModel.currentExpandedWidth + 8
+                currentH = self.viewModel.currentExpandedHeight + 8
+            } else {
+                // When collapsed: strictly match the visible island capsule dimensions.
+                // Do not spill down into active application windows or sideways across the menu bar!
+                let baseW: CGFloat = (self.viewModel.media.isAudioPlaying || self.viewModel.isTimerActive)
+                    ? (ScreenMetrics.notchWidth + 80)
+                    : (ScreenMetrics.notchWidth + 20)
+                currentW = baseW
+                currentH = ScreenMetrics.notchHeight
+            }
             
             let minX = (self.windowWidth - currentW) / 2
             let minY = self.windowHeight - currentH

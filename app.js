@@ -118,13 +118,29 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // 1. Expand / Collapse Island Logic
+  let hoverExpandTimeout = null;
+  let isPageScrolling = false;
+  let scrollDebounceTimeout = null;
+
+  // Track scrolling: If user is actively scrolling the webpage, ignore cursor passes
+  window.addEventListener('scroll', () => {
+    isPageScrolling = true;
+    clearTimeout(hoverExpandTimeout);
+    clearTimeout(scrollDebounceTimeout);
+    scrollDebounceTimeout = setTimeout(() => {
+      isPageScrolling = false;
+    }, 200);
+  }, { passive: true });
+
   function expandIsland() {
     clearTimeout(collapseTimeout);
+    clearTimeout(hoverExpandTimeout);
     island.classList.remove('compact');
     island.classList.add('expanded');
   }
 
   function collapseIsland() {
+    clearTimeout(hoverExpandTimeout);
     if (isPinned) return;
     clearTimeout(collapseTimeout);
     collapseTimeout = setTimeout(() => {
@@ -135,9 +151,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 180);
   }
 
-  island.addEventListener('mouseenter', expandIsland);
-  island.addEventListener('mouseleave', collapseIsland);
+  // Intentional Hover Intent:
+  // Requires hovering deliberately for 300ms before popping open.
+  // Brushing past while scrolling or swiping the trackpad will NOT trigger expansion!
+  island.addEventListener('mouseenter', () => {
+    clearTimeout(collapseTimeout);
+    if (island.classList.contains('expanded')) return;
+    if (isPageScrolling) return; // Do not trigger while scrolling the page!
+    
+    clearTimeout(hoverExpandTimeout);
+    hoverExpandTimeout = setTimeout(() => {
+      if (!isPageScrolling) {
+        expandIsland();
+      }
+    }, 300);
+  });
+
+  island.addEventListener('mouseleave', () => {
+    clearTimeout(hoverExpandTimeout);
+    collapseIsland();
+  });
+
+  // Clicking on the compact notch expands INSTANTLY without any delay
   island.addEventListener('click', (e) => {
+    clearTimeout(hoverExpandTimeout);
     if (island.classList.contains('compact')) {
       expandIsland();
     }

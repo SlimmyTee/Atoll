@@ -91,6 +91,11 @@ public struct IslandView: View {
                 }
                 return true
             }
+            .onChange(of: isTargetedForDrop) { _, targeted in
+                if targeted {
+                    vm.onDragTargetChanged(isTargeted: true)
+                }
+            }
             
             Spacer()
         }
