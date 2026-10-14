@@ -444,17 +444,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById(btnId);
     const codeEl = document.getElementById(textId);
     if (!btn || !codeEl) return;
+
+    function markCopied() {
+      const label = btn.querySelector('.copy-label');
+      if (label) {
+        const old = label.textContent;
+        label.textContent = 'Copied!';
+        setTimeout(() => label.textContent = old, 2000);
+      }
+    }
+
     btn.addEventListener('click', () => {
       const text = codeEl.textContent.trim();
-      navigator.clipboard.writeText(text).then(() => {
-        const label = btn.querySelector('.copy-label');
-        if (label) {
-          const old = label.textContent;
-          label.textContent = 'Copied!';
-          setTimeout(() => label.textContent = old, 2000);
-        }
-      });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(markCopied)
+          .catch(() => {
+            fallbackCopy(text);
+            markCopied();
+          });
+      } else {
+        fallbackCopy(text);
+        markCopied();
+      }
     });
+  }
+
+  function fallbackCopy(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(textArea);
   }
 
   setupCopyBtn('copy-brew-cmd', 'brew-code-text');

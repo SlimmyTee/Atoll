@@ -2134,3 +2134,18 @@ body {
   .gatekeeper-steps-mini { grid-template-columns: 1fr; }
   .install-method-tabs { flex-direction: column; width: 100%; }
 }
+
+.rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  display: inline-block;
+  animation: recPulse 2s ease-in-out infinite;
+}
+
+@keyframes recPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.85); }
+}
