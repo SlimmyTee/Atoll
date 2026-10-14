@@ -21,6 +21,11 @@ mkdir -p "$RESOURCES_DIR"
 cp "$DIR/.build/release/DynamicIsland" "$MACOS_DIR/DynamicIsland"
 chmod +x "$MACOS_DIR/DynamicIsland"
 
+# Copy Icon
+if [ -f "$DIR/AppIcon.icns" ]; then
+    cp "$DIR/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+fi
+
 # Create Info.plist
 cat <<EOF > "$CONTENTS_DIR/Info.plist"
 <?xml version="1.0" encoding="UTF-8"?>
@@ -31,12 +36,16 @@ cat <<EOF > "$CONTENTS_DIR/Info.plist"
     <string>en</string>
     <key>CFBundleExecutable</key>
     <string>DynamicIsland</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
     <string>com.danielumoren.dynamicisland</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>DynamicIsland</string>
+    <string>Atoll</string>
+    <key>CFBundleDisplayName</key>
+    <string>Atoll</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
