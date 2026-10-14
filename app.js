@@ -559,7 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.removeChild(textArea);
   }
 
-  setupCopyBtn('copy-brew-cmd', 'brew-code-text');
   setupCopyBtn('copy-curl-cmd', 'curl-code-text');
 
   // 8. Live Simulated Clock
