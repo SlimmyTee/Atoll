@@ -539,11 +539,11 @@ document.addEventListener('DOMContentLoaded', () => {
           .then(markCopied)
           .catch(() => {
             fallbackCopy(text);
-            markCopied();
+            markCopied(); trackEvent('copy_command', 'conversion', 'install_1liner');
           });
       } else {
         fallbackCopy(text);
-        markCopied();
+        markCopied(); trackEvent('copy_command', 'conversion', 'install_1liner');
       }
     });
   }
@@ -560,6 +560,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   setupCopyBtn('copy-curl-cmd', 'curl-code-text');
+
+  // Analytics Event Tracker
+  function trackEvent(action, category, label) {
+    if (typeof window.gtag === "function") {
+      window.gtag("event", action, {
+        event_category: category,
+        event_label: label
+      });
+    }
+  }
+
+  // Track DMG downloads
+  document.querySelectorAll('a[href*="Atoll.dmg"]').forEach(link => {
+    link.addEventListener("click", () => {
+      trackEvent("download_dmg", "conversion", "Atoll.dmg");
+    });
+  });
+
 
   // 8. Live Simulated Clock
   function updateClock() {
