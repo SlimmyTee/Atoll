@@ -230,7 +230,7 @@ public class CalendarController: ObservableObject {
     /// Callback invoked when a meeting is starting or imminent (within 90s)
     public var onMeetingAlert: ((MeetingEvent) -> Void)?
     
-    private let eventStore = EKEventStore()
+    private var eventStore = EKEventStore()
     private var refreshTimer: Timer?
     private var alertCheckTimer: Timer?
     private var alertedMeetingIds: Set<String> = []
@@ -238,10 +238,14 @@ public class CalendarController: ObservableObject {
     public init() {
         checkAuthorization()
         
-        // Periodic calendar events refresh (every 60s)
-        let timer = Timer(timeInterval: 60.0, repeats: true) { [weak self] _ in
+        // Periodic calendar events refresh (every 30s)
+        let timer = Timer(timeInterval: 30.0, repeats: true) { [weak self] _ in
             Task { @MainActor in
-                self?.refreshEvents()
+                if self?.hasCalendarAccess == true {
+                    self?.refreshEvents()
+                } else {
+                    self?.checkAuthorization()
+                }
             }
         }
         RunLoop.main.add(timer, forMode: .common)
@@ -255,39 +259,74 @@ public class CalendarController: ObservableObject {
         }
         RunLoop.main.add(alertTimer, forMode: .common)
         alertCheckTimer = alertTimer
+        
+        // Live observers for Calendar database changes & App activation
+        NotificationCenter.default.addObserver(
+            forName: .EKEventStoreChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.checkAuthorization()
+                self?.refreshEvents()
+            }
+        }
+        
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didBecomeActiveNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.checkAuthorization()
+            }
+        }
     }
     
     public func checkAuthorization() {
         let status = EKEventStore.authorizationStatus(for: .event)
         self.authorizationStatus = status
         
+        var isAuthorized = false
         if #available(macOS 14.0, *) {
             if status == .fullAccess || status == .writeOnly || status.rawValue == 3 {
-                hasCalendarAccess = true
-                refreshEvents()
-                return
+                isAuthorized = true
             }
+        } else if status == .authorized {
+            isAuthorized = true
         }
         
-        if status == .authorized {
-            hasCalendarAccess = true
-            refreshEvents()
-            return
+        if isAuthorized {
+            self.hasCalendarAccess = true
+            self.refreshEvents()
+        } else {
+            self.hasCalendarAccess = false
+            self.upcomingMeetings = []
+            self.nextMeeting = nil
         }
-        
-        hasCalendarAccess = false
-        upcomingMeetings = []
-        nextMeeting = nil
     }
     
     public func requestAccess() {
+        let status = EKEventStore.authorizationStatus(for: .event)
+        if status == .denied || status == .restricted {
+            openCalendarSettings()
+            return
+        }
+        
+        // Force app to active state so system permission prompt is raised to the foreground
+        NSApp.activate(ignoringOtherApps: true)
+        
         if #available(macOS 14.0, *) {
             eventStore.requestFullAccessToEvents { [weak self] granted, error in
                 Task { @MainActor in
                     self?.hasCalendarAccess = granted
                     self?.authorizationStatus = EKEventStore.authorizationStatus(for: .event)
                     if granted {
+                        self?.eventStore = EKEventStore()
                         self?.refreshEvents()
+                    } else {
+                        // If system silently denied without prompting, open Settings directly
+                        self?.openCalendarSettings()
                     }
                 }
             }
@@ -297,7 +336,10 @@ public class CalendarController: ObservableObject {
                     self?.hasCalendarAccess = granted
                     self?.authorizationStatus = EKEventStore.authorizationStatus(for: .event)
                     if granted {
+                        self?.eventStore = EKEventStore()
                         self?.refreshEvents()
+                    } else {
+                        self?.openCalendarSettings()
                     }
                 }
             }
