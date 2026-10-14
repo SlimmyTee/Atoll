@@ -68,7 +68,11 @@ public struct MediaWidgetView: View {
                     // Source badge
                     HStack(spacing: 4) {
                         Circle()
-                            .fill(media.currentTrack.source == .spotify ? Color.green : Color.pink)
+                            .fill(
+                                media.currentTrack.source == .spotify ? Color.green :
+                                media.currentTrack.source == .appleMusic ? Color.pink :
+                                media.currentTrack.source == .youtube ? Color.red : Color.blue
+                            )
                             .frame(width: 6, height: 6)
                         Text(media.currentTrack.source.rawValue)
                             .font(.system(size: 10, weight: .medium))

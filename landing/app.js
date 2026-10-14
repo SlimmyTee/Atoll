@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const trackArtist = document.getElementById('track-artist');
   const mediaArtworkImg = document.getElementById('media-artwork-img');
   const mediaAmbientGlow = document.getElementById('media-ambient-glow');
+  const sourceBadge = document.getElementById('source-badge');
   const btnSwitchSong = document.getElementById('btn-switch-song');
   const btnNext = document.getElementById('btn-next');
   const btnPrev = document.getElementById('btn-prev');
@@ -76,7 +77,32 @@ document.addEventListener('DOMContentLoaded', () => {
       album: 'PSYCHODRAMA',
       artwork: 'https://i.scdn.co/image/ab67616d0000b273565f69a950084775df6a4e77',
       duration: 205,
+      source: 'Spotify',
+      badgeClass: 'spotify',
+      badgeDot: '#10b981',
       glow: 'rgba(56, 189, 248, 0.7)'
+    },
+    {
+      title: 'Blinding Lights',
+      artist: 'The Weeknd',
+      album: 'After Hours',
+      artwork: 'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/a4/09/b8/a409b83b-f458-941d-d2f6-410777e5d262/20UMGIM02110.rgb.jpg/600x600bb.jpg',
+      duration: 200,
+      source: 'Apple Music',
+      badgeClass: 'apple-music',
+      badgeDot: '#fc3c44',
+      glow: 'rgba(252, 60, 68, 0.7)'
+    },
+    {
+      title: 'Lofi Hip Hop Radio',
+      artist: 'Lofi Girl • Beats to Relax',
+      album: 'YouTube Live',
+      artwork: 'https://i.ytimg.com/vi/jfKfPfyJRdk/maxresdefault.jpg',
+      duration: 900,
+      source: 'YouTube',
+      badgeClass: 'youtube',
+      badgeDot: '#ef4444',
+      glow: 'rgba(239, 68, 68, 0.7)'
     },
     {
       title: 'Starboy',
@@ -84,15 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
       album: 'Starboy',
       artwork: 'https://i.scdn.co/image/ab67616d00001e025551adb75cf7c4737f93ed1d',
       duration: 230,
+      source: 'Spotify',
+      badgeClass: 'spotify',
+      badgeDot: '#10b981',
       glow: 'rgba(168, 85, 247, 0.7)'
-    },
-    {
-      title: 'Psycho',
-      artist: 'Dave',
-      album: 'PSYCHODRAMA',
-      artwork: 'https://i.scdn.co/image/ab67616d0000b273565f69a950084775df6a4e77',
-      duration: 248,
-      glow: 'rgba(37, 99, 235, 0.7)'
     }
   ];
 
@@ -183,6 +204,10 @@ document.addEventListener('DOMContentLoaded', () => {
     currentSeconds = 15;
     mediaAmbientGlow.style.background = `radial-gradient(circle, ${song.glow} 0%, transparent 70%)`;
     updateScrubber();
+    if (sourceBadge) {
+      sourceBadge.className = 'source-badge ' + (song.badgeClass || 'spotify');
+      sourceBadge.innerHTML = '<span class="source-dot" style="background:' + (song.badgeDot || '#10b981') + '"></span> ' + (song.source || 'Spotify');
+    }
   }
 
   function togglePlayPause() {

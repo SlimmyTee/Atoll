@@ -2149,3 +2149,15 @@ body {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.45; transform: scale(0.85); }
 }
+
+.source-badge.apple-music {
+  background: rgba(252, 60, 68, 0.14);
+  border: 1px solid rgba(252, 60, 68, 0.3);
+  color: #fc3c44;
+}
+
+.source-badge.youtube {
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}

@@ -16,6 +16,8 @@ public struct TrackInfo: Sendable, Equatable {
     public enum MediaSource: String, Sendable {
         case spotify = "Spotify"
         case appleMusic = "Apple Music"
+        case youtube = "YouTube"
+        case browser = "Browser Audio"
         case demo = "Now Playing"
     }
     
@@ -316,6 +318,117 @@ public class MediaController: ObservableObject {
         return nil
     }
     
+    private nonisolated static func checkBrowserMedia() -> TrackInfo? {
+        // Chromium Browsers (Google Chrome, Arc, Brave)
+        let chromiumApps = [
+            ("com.google.Chrome", "Google Chrome"),
+            ("company.thebrowser.Browser", "Arc"),
+            ("com.brave.Browser", "Brave Browser")
+        ]
+        
+        for (bundleId, appName) in chromiumApps {
+            if !NSRunningApplication.runningApplications(withBundleIdentifier: bundleId).isEmpty {
+                let script = """
+                tell application "\(appName)"
+                    repeat with w in windows
+                        repeat with t in tabs of w
+                            set u to URL of t
+                            if u contains "youtube.com/watch" or u contains "music.youtube.com" or u contains "music.apple.com" or u contains "soundcloud.com" then
+                                set tit to title of t
+                                return tit & "|||" & u
+                            end if
+                        end repeat
+                    end repeat
+                end tell
+                """
+                if let output = runAppleScriptQuery(script), !output.isEmpty {
+                    let parts = output.components(separatedBy: "|||")
+                    if parts.count >= 2 {
+                        let rawTitle = parts[0]
+                        let url = parts[1]
+                        let isYoutube = url.contains("youtube.com")
+                        let isApple = url.contains("music.apple.com")
+                        let source: TrackInfo.MediaSource = isApple ? .appleMusic : (isYoutube ? .youtube : .browser)
+                        
+                        var cleanTitle = rawTitle.replacingOccurrences(of: " - YouTube", with: "")
+                        var cleanArtist = isYoutube ? "YouTube" : (isApple ? "Apple Music Web" : "Browser Audio")
+                        
+                        if cleanTitle.contains(" - ") {
+                            let split = cleanTitle.components(separatedBy: " - ")
+                            if split.count >= 2 {
+                                cleanArtist = split[0].trimmingCharacters(in: .whitespaces)
+                                cleanTitle = split[1].trimmingCharacters(in: .whitespaces)
+                            }
+                        }
+                        
+                        return TrackInfo(
+                            title: cleanTitle,
+                            artist: cleanArtist,
+                            album: isYoutube ? "YouTube Playback" : "Web Player",
+                            isPlaying: true,
+                            position: 30,
+                            duration: 180,
+                            source: source,
+                            artworkUrl: nil,
+                            artworkData: nil
+                        )
+                    }
+                }
+            }
+        }
+        
+        // Safari
+        if !NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Safari").isEmpty {
+            let script = """
+            tell application "Safari"
+                repeat with w in windows
+                    repeat with t in tabs of w
+                        set u to URL of t
+                        if u contains "youtube.com/watch" or u contains "music.youtube.com" or u contains "music.apple.com" then
+                            set tit to name of t
+                            return tit & "|||" & u
+                        end if
+                    end repeat
+                end repeat
+            end tell
+            """
+            if let output = runAppleScriptQuery(script), !output.isEmpty {
+                let parts = output.components(separatedBy: "|||")
+                if parts.count >= 2 {
+                    let rawTitle = parts[0]
+                    let url = parts[1]
+                    let isApple = url.contains("music.apple.com")
+                    let isYoutube = url.contains("youtube.com")
+                    
+                    var cleanTitle = rawTitle.replacingOccurrences(of: " - YouTube", with: "")
+                    var cleanArtist = isYoutube ? "YouTube" : (isApple ? "Apple Music Web" : "Safari")
+                    
+                    if cleanTitle.contains(" - ") {
+                        let split = cleanTitle.components(separatedBy: " - ")
+                        if split.count >= 2 {
+                            cleanArtist = split[0].trimmingCharacters(in: .whitespaces)
+                            cleanTitle = split[1].trimmingCharacters(in: .whitespaces)
+                        }
+                    }
+                    
+                    return TrackInfo(
+                        title: cleanTitle,
+                        artist: cleanArtist,
+                        album: "Safari Playback",
+                        isPlaying: true,
+                        position: 30,
+                        duration: 180,
+                        source: isApple ? .appleMusic : (isYoutube ? .youtube : .browser),
+                        artworkUrl: nil,
+                        artworkData: nil
+                    )
+                }
+            }
+        }
+        
+        return nil
+    }
+
     private nonisolated static func checkSpotify() -> TrackInfo? {
         guard !NSRunningApplication.runningApplications(withBundleIdentifier: "com.spotify.client").isEmpty else {
             return nil
@@ -425,6 +538,13 @@ public class MediaController: ObservableObject {
                 Self.runAppleScriptCommand("tell application \"Spotify\" to playpause")
             } else if src == .appleMusic {
                 Self.runAppleScriptCommand("tell application \"Music\" to playpause")
+            } else if src == .youtube || src == .browser {
+                // Send Play/Pause to browser video element via AppleScript
+                if !NSRunningApplication.runningApplications(withBundleIdentifier: "com.google.Chrome").isEmpty {
+                    Self.runAppleScriptCommand("tell application \"Google Chrome\" to execute active tab of front window javascript \"document.querySelector('video, audio')?.paused ? document.querySelector('video, audio')?.play() : document.querySelector('video, audio')?.pause()\"")
+                } else if !NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Safari").isEmpty {
+                    Self.runAppleScriptCommand("tell application \"Safari\" to do JavaScript \"document.querySelector('video, audio')?.paused ? document.querySelector('video, audio')?.play() : document.querySelector('video, audio')?.pause()\" in current tab of front window")
+                }
             } else if !NSRunningApplication.runningApplications(withBundleIdentifier: "com.spotify.client").isEmpty {
                 Self.runAppleScriptCommand("tell application \"Spotify\" to playpause")
             } else if !NSRunningApplication.runningApplications(withBundleIdentifier: "com.apple.Music").isEmpty {
